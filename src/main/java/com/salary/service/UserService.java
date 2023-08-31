@@ -8,6 +8,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 @Transactional
 @Service
@@ -29,5 +31,9 @@ public class UserService {
         if (findUser != null) {
             throw new IllegalStateException("이미 가입된 이메일입니다.");
         }
+    }
+
+    public List<User> findAll() {
+        return userRepository.findAll();
     }
 }

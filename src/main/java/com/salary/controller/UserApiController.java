@@ -2,16 +2,20 @@ package com.salary.controller;
 
 import com.salary.domain.User;
 import com.salary.dto.UserRequest;
+import com.salary.dto.UserResponse;
 import com.salary.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @RestController
@@ -27,5 +31,15 @@ public class UserApiController {
                 .buildAndExpand(savedUser.getId())
                 .toUri();
         return ResponseEntity.created(location).body(savedUser);
+    }
+
+    // 모든 회원 조회
+    @GetMapping("/api/users")
+    public ResponseEntity<List<UserResponse>> findAllUsers() {
+        List<UserResponse> users = userService.findAll()
+                .stream()
+                .map(UserResponse::new).collect(Collectors.toList());
+        return ResponseEntity.ok()
+                .body(users);
     }
 }

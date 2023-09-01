@@ -47,4 +47,12 @@ public class UserApiController {
         return ResponseEntity.ok()
                 .body(new UserResponse(user));
     }
+
+    // 특정 회원 수정 (비밀번호 만)
+    @PutMapping("/api/users/{id}")
+    public ResponseEntity<User> updateUser(@Valid @RequestBody UserRequest request, @PathVariable("id") Long id) {
+        User updatedUser = userService.update(id, request);
+        return ResponseEntity.ok()
+                .body(updatedUser);
+    }
 }

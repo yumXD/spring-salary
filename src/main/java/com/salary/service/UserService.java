@@ -41,4 +41,10 @@ public class UserService {
     public User findById(Long id) {
         return userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 회원입니다"));
     }
+
+    public User update(Long id, UserRequest request) {
+        User user = findById(id);
+        user.update(request, bCryptPasswordEncoder);
+        return user;
+    }
 }

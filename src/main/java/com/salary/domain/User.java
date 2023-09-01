@@ -83,4 +83,8 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+    public void update(UserRequest request, BCryptPasswordEncoder bCryptPasswordEncoder) {
+        this.password = bCryptPasswordEncoder.encode(request.getPassword());
+    }
 }

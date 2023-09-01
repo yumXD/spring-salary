@@ -3,6 +3,7 @@ package com.salary.service;
 import com.salary.domain.User;
 import com.salary.dto.UserRequest;
 import com.salary.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -35,5 +36,9 @@ public class UserService {
 
     public List<User> findAll() {
         return userRepository.findAll();
+    }
+
+    public User findById(Long id) {
+        return userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 회원입니다"));
     }
 }

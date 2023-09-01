@@ -47,4 +47,8 @@ public class UserService {
         user.update(request, bCryptPasswordEncoder);
         return user;
     }
+
+    public void delete(Long id) {
+        userRepository.deleteById(id);
+    }
 }

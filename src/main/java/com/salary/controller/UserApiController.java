@@ -55,4 +55,12 @@ public class UserApiController {
         return ResponseEntity.ok()
                 .body(updatedUser);
     }
+
+    // 특정 회원 삭제
+    @DeleteMapping("/api/users/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable("id") Long id) {
+        userService.delete(id);
+        return ResponseEntity.ok()
+                .build();
+    }
 }

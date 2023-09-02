@@ -51,4 +51,14 @@ public class UserService {
     public void delete(Long id) {
         userRepository.deleteById(id);
     }
+
+    public Long findByEmail(String email) {
+        User user = userRepository.findByEmail(email);
+
+        if (user == null) {
+            throw new EntityNotFoundException("존재하지 않는 회원입니다");
+        }
+
+        return user.getId();
+    }
 }

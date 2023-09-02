@@ -14,7 +14,20 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable);
+                .csrf(AbstractHttpConfigurer::disable)
+                .formLogin(formLogin ->
+                        formLogin
+                                .loginPage("/users/login")
+                                .defaultSuccessUrl("/")
+                )
+                .logout(logout ->
+                        logout
+                                .logoutUrl("/users/logout")
+                                .logoutSuccessUrl("/")
+                                .invalidateHttpSession(true)
+                                .deleteCookies("JSESSIONID")
+                )
+        ;
         return http.build();
     }
 

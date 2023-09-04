@@ -27,4 +27,9 @@ public class UserViewController {
 
         return "user/profile";  // profile.html 페이지로 이동
     }
+
+    @GetMapping("/users/register")
+    public String register() {
+        return "user/register";
+    }
 }

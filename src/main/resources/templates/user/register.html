@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html
+  layout:decorate="~{layouts/layout1}"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+>
+  <th:block layout:fragment="script">
+    <script th:inline="javascript">
+      const userId = document.getElementById("userId").value;
+
+      const registerButton = document.getElementById("register-btn");
+
+      if (registerButton) {
+        registerButton.addEventListener("click", (event) => {
+          fetch(`/api/users`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              username: document.getElementById("username").value,
+              email: document.getElementById("email").value,
+              password: document.getElementById("password").value,
+            }),
+          })
+            .then((response) => {
+              if (!response.ok) {
+                // 응답이 OK가 아닌 경우, JSON을 파싱하고 오류 처리 로직으로 전달
+                return response.json().then((errors) => {
+                  throw errors; // 오류를 던져서 아래의 catch 블록에서 처리
+                });
+              }
+              return response.json(); // 응답이 OK인 경우 JSON 파싱
+            })
+            .then((data) => {
+              // 성공적인 응답 처리 로직
+              alert("가입 완료되었습니다.");
+              location.replace(`/users/login`);
+            })
+            .catch((errors) => {
+              // 오류 처리 로직 (displayErrors 함수로 오류 표시)
+              displayErrors(errors);
+            });
+        });
+      }
+
+      function displayErrors(errors) {
+        // 기존의 오류 메시지를 모두 삭제합니다.
+        const existingErrorElements =
+          document.querySelectorAll(".error-message");
+        existingErrorElements.forEach((el) => el.remove());
+
+        const globalErrorContainer = document.getElementById(
+          "global-error-container"
+        );
+
+        for (const [key, value] of Object.entries(errors)) {
+          const errorElement = document.createElement("div");
+          errorElement.className = "error-message alert alert-danger mt-2";
+          errorElement.textContent = `${key}: ${value}`;
+          globalErrorContainer.appendChild(errorElement);
+        }
+      }
+    </script>
+  </th:block>
+
+  <div layout:fragment="content">
+    <!-- 오류 메시지를 표시할 컨테이너 -->
+    <div id="global-error-container"></div>
+    <form id="registrationForm">
+      <div class="form-group">
+        <input type="hidden" id="userId" th:value="${id}" />
+        <label for="username">이름:</label>
+        <input
+          type="text"
+          id="username"
+          name="username"
+          class="form-control"
+          th:disabled="${id != null}"
+          required
+        />
+      </div>
+      <div class="form-group">
+        <label for="email">이메일:</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          class="form-control"
+          th:disabled="${id != null}"
+          required
+        />
+      </div>
+      <div class="form-group">
+        <label for="password">비밀번호:</label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          class="form-control"
+          required
+        />
+      </div>
+      <div th:if="${#strings.isEmpty(id)}" style="text-align: center">
+        <!-- 추가적으로 필요한 필드가 있다면 여기에 추가합니다. -->
+        <button type="button" class="btn btn-success" id="register-btn">
+          가입하기
+        </button>
+      </div>
+      <div th:unless="${#strings.isEmpty(id)}" style="text-align: center">
+        <button type="button" id="modify-btn" class="btn btn-primary">
+          수정하기
+        </button>
+      </div>
+    </form>
+  </div>
+</html>

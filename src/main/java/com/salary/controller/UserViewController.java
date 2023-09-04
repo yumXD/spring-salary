@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.security.Principal;
 
@@ -30,6 +31,12 @@ public class UserViewController {
 
     @GetMapping("/users/register")
     public String register() {
+        return "user/register";
+    }
+
+    @GetMapping("/users/profile/edit/{id}")
+    public String editUser(Model model, @PathVariable("id") Long id) {
+        model.addAttribute("id", id);
         return "user/register";
     }
 }

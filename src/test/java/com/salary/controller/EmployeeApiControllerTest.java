@@ -22,7 +22,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -81,5 +81,31 @@ class EmployeeApiControllerTest {
         assertThat(employees.get(0).getName()).isEqualTo(name);
         assertThat(employees.get(0).getPosition()).isEqualTo(position);
         assertThat(employees.get(0).getDepartment()).isEqualTo(department);
+    }
+
+    @DisplayName("findAllEmployees: 모든 직원 조회에 성공한다.")
+    @Test
+    public void findAllEmployees() throws Exception {
+        //given
+        final String url = "/api/employees";
+
+        final String name = "홍길동";
+        final String position = "부장";
+        final String department = "영업부";
+
+        EmployeeRequest employeeRequest = new EmployeeRequest(name, position, department);
+        employeeRepository.save(employeeRequest.toEntity());
+
+        //when
+        //설정한 내용을 바탕으로 요청 전송
+        final ResultActions resultActions = mockMvc.perform(get(url)
+                .accept(MediaType.APPLICATION_JSON));
+
+        //then
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].name").value(name))
+                .andExpect(jsonPath("$[0].position").value(position))
+                .andExpect(jsonPath("$[0].department").value(department));
     }
 }

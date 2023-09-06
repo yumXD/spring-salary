@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 @Transactional
 @Service
@@ -15,5 +17,9 @@ public class EmployeeService {
 
     public Employee createEmployee(EmployeeRequest employeeRequest) {
         return employeeRepository.save(employeeRequest.toEntity());
+    }
+
+    public List<Employee> findAll() {
+        return employeeRepository.findAll();
     }
 }

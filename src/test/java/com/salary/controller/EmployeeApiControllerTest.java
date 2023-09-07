@@ -133,4 +133,45 @@ class EmployeeApiControllerTest {
                 .andExpect(jsonPath("$.position").value(position))
                 .andExpect(jsonPath("$.department").value(department));
     }
+
+    @DisplayName("updateEmployee: 특정 직원 수정에 성공한다.")
+    @Test
+    public void updateEmployee() throws Exception {
+        //given
+        final String url = "/api/employees/{id}";
+
+        final String name = "홍길동";
+        final String position = "부장";
+        final String department = "영업부";
+
+        Employee savedEmployee = employeeRepository.save(new EmployeeRequest(name, position, department).toEntity());
+
+
+        final String newName = "임꺽정";
+        final String newPosition = "임원";
+        final String newDepartment = "마케팅부";
+
+        EmployeeRequest employeeRequest = new EmployeeRequest(newName, newPosition, newDepartment);
+
+        // 객체 JSON으로 직렬화
+        final String requestBody = objectMapper.writeValueAsString(employeeRequest);
+
+        //when
+        //설정한 내용을 바탕으로 요청 전송
+        final ResultActions resultActions = mockMvc.perform(put(url, savedEmployee.getId())
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(requestBody));
+
+        //then
+        resultActions
+                .andExpect(status().isOk());
+
+        List<Employee> employees = employeeRepository.findAll();
+
+        assertThat(employees.size()).isEqualTo(1);
+        assertNull(employees.get(0).getSalaryDetails());
+        assertThat(employees.get(0).getName()).isEqualTo(newName);
+        assertThat(employees.get(0).getPosition()).isEqualTo(newPosition);
+        assertThat(employees.get(0).getDepartment()).isEqualTo(newDepartment);
+    }
 }

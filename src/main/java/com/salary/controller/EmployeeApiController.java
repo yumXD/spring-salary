@@ -7,10 +7,7 @@ import com.salary.service.EmployeeService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
@@ -40,5 +37,12 @@ public class EmployeeApiController {
                 .stream()
                 .map(EmployeeResponse::new).collect(Collectors.toList());
         return ResponseEntity.ok().body(employees);
+    }
+
+    // 특정 직원 조회
+    @GetMapping("/api/employees/{id}")
+    public ResponseEntity<EmployeeResponse> findEmployee(@PathVariable("id") Long id) {
+        Employee employee = employeeService.findById(id);
+        return ResponseEntity.ok().body(new EmployeeResponse(employee));
     }
 }

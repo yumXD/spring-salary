@@ -108,4 +108,29 @@ class EmployeeApiControllerTest {
                 .andExpect(jsonPath("$[0].position").value(position))
                 .andExpect(jsonPath("$[0].department").value(department));
     }
+
+    @DisplayName("findEmployee: 특정 직원 조회에 성공한다.")
+    @Test
+    public void findEmployee() throws Exception {
+        //given
+        final String url = "/api/employees/{id}";
+
+        final String name = "홍길동";
+        final String position = "부장";
+        final String department = "영업부";
+
+        EmployeeRequest employeeRequest = new EmployeeRequest(name, position, department);
+        Employee savedEmployee = employeeRepository.save(employeeRequest.toEntity());
+
+        //when
+        //설정한 내용을 바탕으로 요청 전송
+        final ResultActions resultActions = mockMvc.perform(get(url, savedEmployee.getId()));
+
+        //then
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value(name))
+                .andExpect(jsonPath("$.position").value(position))
+                .andExpect(jsonPath("$.department").value(department));
+    }
 }

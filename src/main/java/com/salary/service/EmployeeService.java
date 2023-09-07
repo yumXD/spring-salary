@@ -27,4 +27,10 @@ public class EmployeeService {
     public Employee findById(Long id) {
         return employeeRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 직원입니다"));
     }
+
+    public Employee update(Long id, EmployeeRequest request) {
+        Employee employee = findById(id);
+        employee.update(request);
+        return employee;
+    }
 }

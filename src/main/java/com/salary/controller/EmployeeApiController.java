@@ -45,4 +45,12 @@ public class EmployeeApiController {
         Employee employee = employeeService.findById(id);
         return ResponseEntity.ok().body(new EmployeeResponse(employee));
     }
+
+    // 특정 직원 수정
+    @PutMapping("/api/employees/{id}")
+    public ResponseEntity<Employee> updateEmployee(@PathVariable("id") Long id, @Valid @RequestBody EmployeeRequest request) {
+        Employee updatedEmployee = employeeService.update(id, request);
+        return ResponseEntity.ok()
+                .body(updatedEmployee);
+    }
 }

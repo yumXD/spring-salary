@@ -1,6 +1,7 @@
 package com.salary.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.salary.dto.EmployeeRequest;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,4 +25,10 @@ public class Employee {
     @JsonIgnore
     @OneToOne(mappedBy = "employee", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private SalaryDetails salaryDetails;
+
+    public void update(EmployeeRequest request) {
+        this.name = request.getName();
+        this.position = request.getPosition();
+        this.department = request.getDepartment();
+    }
 }

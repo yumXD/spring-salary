@@ -174,4 +174,28 @@ class EmployeeApiControllerTest {
         assertThat(employees.get(0).getPosition()).isEqualTo(newPosition);
         assertThat(employees.get(0).getDepartment()).isEqualTo(newDepartment);
     }
+
+    @DisplayName("deleteEmployee: 특정 직원 삭제에 성공한다.")
+    @Test
+    public void deleteEmployee() throws Exception {
+        //given
+        final String url = "/api/employees/{id}";
+
+        final String name = "홍길동";
+        final String position = "부장";
+        final String department = "영업부";
+
+        EmployeeRequest employeeRequest = new EmployeeRequest(name, position, department);
+        Employee savedEmployee = employeeRepository.save(employeeRequest.toEntity());
+
+        //when
+        //설정한 내용을 바탕으로 요청 전송
+        mockMvc.perform(delete(url, savedEmployee.getId()))
+                .andExpect(status().isOk());
+
+        //then
+        List<Employee> employees = employeeRepository.findAll();
+
+        assertThat(employees).isEmpty();
+    }
 }

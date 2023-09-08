@@ -33,4 +33,12 @@ public class EmployeeService {
         employee.update(request);
         return employee;
     }
+
+    public void deleteById(Long id) {
+        // findById 메소드를 사용하여 해당 ID의 엔터티가 존재하는지 확인
+        Employee employee = findById(id);
+
+        // 엔터티가 존재하면 삭제
+        employeeRepository.delete(employee);
+    }
 }

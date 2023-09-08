@@ -53,4 +53,12 @@ public class EmployeeApiController {
         return ResponseEntity.ok()
                 .body(updatedEmployee);
     }
+
+    // 특정 직원 삭제
+    @DeleteMapping("/api/employees/{id}")
+    public ResponseEntity<Void> deleteEmployee(@PathVariable("id") Long id) {
+        employeeService.deleteById(id);
+        return ResponseEntity.ok()
+                .build();
+    }
 }

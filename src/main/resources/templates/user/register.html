@@ -10,13 +10,25 @@
       if (userId) {
         // ID 값이 있을 때만 API 호출
         fetch("/api/users/" + userId)
-          .then((response) => response.json())
+          .then((response) => {
+            if (!response.ok) {
+              // 응답이 OK가 아닌 경우, JSON을 파싱하고 오류 처리 로직으로 전달
+              return response.json().then((errors) => {
+                throw errors; // 오류를 던져서 아래의 catch 블록에서 처리
+              });
+            }
+            return response.json();
+          })
           .then((data) => {
             document.getElementById("username").value = data.username;
             document.getElementById("email").value = data.email;
             // 추가 필드들도 여기에 추가합니다.
           })
-          .catch((error) => console.error("Error:", error));
+          .catch((error) => {
+            alert(error.message || "오류가 발생했습니다.");
+            // 루트 페이지로 강제 리다이렉션
+            window.location.href = "/";
+          });
       }
 
       const registerButton = document.getElementById("register-btn");

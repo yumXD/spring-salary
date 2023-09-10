@@ -23,6 +23,9 @@ public class CustomErrorViewController implements ErrorController {
             } else if (statusCode == HttpStatus.INTERNAL_SERVER_ERROR.value()) {
                 // 서버 에러
                 return "error/500";
+            }else if (statusCode == HttpStatus.FORBIDDEN.value()) {
+                // 권한 에러
+                return "error/403";
             }
         }
         return "error/error";

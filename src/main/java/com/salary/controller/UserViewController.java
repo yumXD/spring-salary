@@ -2,6 +2,7 @@ package com.salary.controller;
 
 import com.salary.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,6 +35,7 @@ public class UserViewController {
         return "user/register";
     }
 
+    @PreAuthorize("#id == authentication.principal.id")
     @GetMapping("/users/profile/edit/{id}")
     public String editUser(Model model, @PathVariable("id") Long id) {
         model.addAttribute("id", id);

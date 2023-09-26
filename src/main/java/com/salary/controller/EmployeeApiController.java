@@ -6,13 +6,13 @@ import com.salary.dto.EmployeeResponse;
 import com.salary.service.EmployeeService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @RestController
@@ -32,10 +32,10 @@ public class EmployeeApiController {
 
     // 모든 직원 조회
     @GetMapping("/api/employees")
-    public ResponseEntity<List<EmployeeResponse>> findAllEmployees() {
-        List<EmployeeResponse> employees = employeeService.findAll()
-                .stream()
-                .map(EmployeeResponse::new).collect(Collectors.toList());
+    public ResponseEntity<Page<EmployeeResponse>> findAllEmployees(@RequestParam(value = "page", defaultValue = "0") int page,
+                                                                   @RequestParam(value = "size", defaultValue = "3") int size) {
+        Page<Employee> employeePage = employeeService.findAll(PageRequest.of(page, size));
+        Page<EmployeeResponse> employees = employeePage.map(EmployeeResponse::new);
         return ResponseEntity.ok().body(employees);
     }
 

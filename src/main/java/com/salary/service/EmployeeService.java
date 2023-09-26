@@ -5,6 +5,8 @@ import com.salary.dto.EmployeeRequest;
 import com.salary.repository.EmployeeRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,5 +42,9 @@ public class EmployeeService {
 
         // 엔터티가 존재하면 삭제
         employeeRepository.delete(employee);
+    }
+
+    public Page<Employee> findAll(Pageable pageable) {
+        return employeeRepository.findAll(pageable);
     }
 }

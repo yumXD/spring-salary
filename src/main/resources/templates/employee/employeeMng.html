@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html
+  layout:decorate="~{layouts/layout1}"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+>
+  <th:block layout:fragment="script">
+    <script th:inline="javascript">
+      const sizeSelector = document.getElementById("sizeSelector");
+
+      // size 값 변경 리스너 추가
+      sizeSelector.addEventListener("change", function () {
+        // 현재 페이지를 0으로 설정하고, 선택된 size로 목록 다시 로드
+        updateURLForPageAndSize(0); // size 변경 시 페이지는 0으로 리셋
+        loadEmployees(0);
+      });
+      // URL에서 페이지 번호를 가져오는 함수
+      function getPageFromURL() {
+        const urlParams = new URLSearchParams(window.location.search);
+        return parseInt(urlParams.get("page") || "0");
+      }
+
+      // URL에서 size 값을 가져오는 함수
+      function getSizeFromURL() {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get("size") || "3"; // 기본값을 3으로 설정
+      }
+
+      // 사용자가 페이지를 이동할 때 URL의 쿼리 매개변수를 업데이트합니다.
+      function updateURLForPageAndSize(page) {
+        const size = sizeSelector.value;
+        const url = new URL(window.location.href);
+        url.searchParams.set("page", page);
+        url.searchParams.set("size", size);
+        window.history.pushState({}, "", url);
+      }
+
+      function loadEmployees(page) {
+        const size = sizeSelector.value; // 선택된 size 값 가져오기
+        fetch(`/api/employees?page=${page}&size=${size}`)
+          .then((response) => {
+            if (!response.ok) {
+              return response.json().then((errors) => {
+                throw errors;
+              });
+            }
+            return response.json();
+          })
+          .then((data) => {
+            const tbody = document.querySelector("#employeeTable tbody");
+            tbody.innerHTML = ""; // Clear current content
+
+            data.content.forEach((employee, index) => {
+              // 번호 계산
+              const number = page * parseInt(size) + (index + 1);
+              tbody.innerHTML += `
+                            <tr>
+                                <td>${number}</td>
+                                <td>${employee.id}</td>
+                                <td><a href="/employee/${employee.id}">${employee.name}</a></td>
+                                <td>${employee.position}</td>
+                                <td>${employee.department}</td>
+                            </tr>`;
+            });
+
+            const totalPages = data.totalPages;
+            updatePagination(page, totalPages);
+          })
+          .catch((errors) => {
+            console.log(errors);
+            alert("직원 정보를 불러오는 데 실패하였습니다. 다시 시도해주세요.");
+          });
+
+        // 페이지 로드 후 URL의 쿼리 매개변수를 업데이트합니다.
+        updateURLForPageAndSize(page);
+      }
+
+      function updatePagination(current, total) {
+        const pagination = document.querySelector("#pagination");
+        const isFirstPage = current === 0;
+        const isLastPage = current === total - 1;
+
+        pagination.innerHTML = `
+        <li class="page-item ${isFirstPage ? "disabled" : ""}" id="firstPage">
+            <a class="page-link" href="javascript:void(0)">첫 페이지</a>
+        </li>
+        <li class="page-item ${
+          isFirstPage ? "disabled" : ""
+        }" id="previousPage">
+            <a class="page-link" href="javascript:void(0)">이전</a>
+        </li>
+    `;
+
+        for (let i = 0; i < total; i++) {
+          pagination.innerHTML += `
+            <li class="page-item ${i === current ? "active" : ""}">
+                <a class="page-link" href="javascript:void(0)" data-page="${i}">${
+            i + 1
+          }</a>
+            </li>`;
+        }
+
+        pagination.innerHTML += `
+        <li class="page-item ${isLastPage ? "disabled" : ""}" id="nextPage">
+            <a class="page-link" href="javascript:void(0)">다음</a>
+        </li>
+        <li class="page-item ${isLastPage ? "disabled" : ""}" id="lastPage">
+            <a class="page-link" href="javascript:void(0)">마지막 페이지</a>
+        </li>
+    `;
+
+        if (!isFirstPage) {
+          document
+            .querySelector("#firstPage")
+            .addEventListener("click", (e) => {
+              loadEmployees(0);
+            });
+
+          document
+            .querySelector("#previousPage")
+            .addEventListener("click", (e) => {
+              if (current > 0) loadEmployees(current - 1);
+            });
+        }
+
+        if (!isLastPage) {
+          document.querySelector("#nextPage").addEventListener("click", (e) => {
+            if (current < total - 1) loadEmployees(current + 1);
+          });
+
+          document.querySelector("#lastPage").addEventListener("click", (e) => {
+            loadEmployees(total - 1);
+          });
+        }
+
+        document.querySelectorAll(".page-link[data-page]").forEach((link) => {
+          link.addEventListener("click", function (event) {
+            let page = parseInt(event.currentTarget.dataset.page);
+            loadEmployees(page);
+          });
+        });
+      }
+
+      // 페이지를 로드할 때 URL의 쿼리 매개변수로부터 페이지 번호를 가져옵니다.
+      document.addEventListener("DOMContentLoaded", function () {
+        const sizeFromURL = getSizeFromURL(); //size 값을 읽어옵니다.
+        sizeSelector.value = sizeFromURL; // <select> 값을 해당 size 값으로 설정
+        const pageFromURL = getPageFromURL();
+        loadEmployees(pageFromURL);
+      });
+    </script>
+  </th:block>
+
+  <div layout:fragment="content">
+    <h1 class="mb-4">직원 목록</h1>
+
+    <!-- size 선택 옵션 (Bootstrap 스타일로 꾸며진 드롭다운 메뉴) -->
+    <div class="form-group">
+      <label for="sizeSelector">항목 수:</label>
+      <select class="form-control" id="sizeSelector">
+        <option value="3">3개</option>
+        <option value="5">5개</option>
+        <option value="10">10개</option>
+      </select>
+    </div>
+
+    <table class="table table-bordered table-hover" id="employeeTable">
+      <thead class="thead-dark">
+        <tr>
+          <th>번호</th>
+          <th>ID</th>
+          <th>이름</th>
+          <th>직책</th>
+          <th>부서</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- 자바스크립트로 채워질 부분입니다. -->
+      </tbody>
+    </table>
+
+    <nav aria-label="Employee Pagination">
+      <ul class="pagination" id="pagination">
+        <li class="page-item" id="firstPage">
+          <a class="page-link" href="#">첫 페이지</a>
+        </li>
+        <li class="page-item" id="previousPage">
+          <a class="page-link" href="#">이전</a>
+        </li>
+        <!-- 페이지 번호는 자바스크립트로 삽입됩니다. -->
+        <li class="page-item" id="nextPage">
+          <a class="page-link" href="#">다음</a>
+        </li>
+        <li class="page-item" id="lastPage">
+          <a class="page-link" href="#">마지막 페이지</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</html>

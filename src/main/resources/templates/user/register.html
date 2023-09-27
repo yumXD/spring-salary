@@ -120,6 +120,39 @@
           globalErrorContainer.appendChild(errorElement);
         }
       }
+
+      const deleteButton = document.getElementById("delete-btn");
+
+      if (deleteButton) {
+        deleteButton.addEventListener("click", (event) => {
+          if (confirm("정말로 회원 탈퇴를 진행하시겠습니까?")) {
+            fetch(`/api/users/${userId}`, {
+              method: "DELETE",
+            })
+              .then((response) => {
+                if (response.ok) {
+                  // 회원 탈퇴가 성공하면 바로 로그아웃 처리
+                  return fetch("/users/logout", {
+                    method: "POST",
+                  });
+                } else {
+                  throw new Error("로그아웃 중 오류가 발생했습니다.");
+                }
+              })
+              .then((response) => {
+                if (response.ok) {
+                  alert("회원 탈퇴 및 로그아웃이 완료되었습니다.");
+                  window.location.href = "/"; // 탈퇴 및 로그아웃 후 메인 페이지로 리다이렉트
+                } else {
+                  throw new Error("회원 탈퇴 중 오류가 발생했습니다.");
+                }
+              })
+              .catch((errors) => {
+                alert("오류가 발생했습니다: " + error);
+              });
+          }
+        });
+      }
     </script>
   </th:block>
 
@@ -169,6 +202,9 @@
       <div th:unless="${#strings.isEmpty(id)}" style="text-align: center">
         <button type="button" id="modify-btn" class="btn btn-primary">
           수정하기
+        </button>
+        <button type="button" id="delete-btn" class="btn btn-danger">
+          회원 탈퇴
         </button>
       </div>
     </form>

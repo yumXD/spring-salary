@@ -47,4 +47,8 @@ public class EmployeeService {
     public Page<Employee> findAll(Pageable pageable) {
         return employeeRepository.findAll(pageable);
     }
+
+    public Page<Employee> findByName(String name, Pageable pageable) {
+        return employeeRepository.findByNameContaining(name, pageable);
+    }
 }

@@ -25,18 +25,33 @@
         return urlParams.get("size") || "3"; // 기본값을 3으로 설정
       }
 
+      function getNameFromURL() {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get("name") || "";
+      }
+
       // 사용자가 페이지를 이동할 때 URL의 쿼리 매개변수를 업데이트합니다.
       function updateURLForPageAndSize(page) {
         const size = sizeSelector.value;
+        const name = document.getElementById("searchName").value; // 이름 값을 가져옵니다.
         const url = new URL(window.location.href);
+        url.searchParams.set("name", name); // 쿼리 매개변수로 추가합니다.
         url.searchParams.set("page", page);
         url.searchParams.set("size", size);
         window.history.pushState({}, "", url);
       }
 
+      document
+        .getElementById("searchButton")
+        .addEventListener("click", function () {
+          updateURLForPageAndSize(0); // 검색시 항상 첫 페이지부터 시작
+          loadEmployees(0);
+        });
+
       function loadEmployees(page) {
         const size = sizeSelector.value; // 선택된 size 값 가져오기
-        fetch(`/api/employees?page=${page}&size=${size}`)
+        const name = getNameFromURL(); // URL에서 이름 값을 가져옵니다.
+        fetch(`/api/employees?name=${name}&page=${page}&size=${size}`)
           .then((response) => {
             if (!response.ok) {
               return response.json().then((errors) => {
@@ -49,10 +64,17 @@
             const tbody = document.querySelector("#employeeTable tbody");
             tbody.innerHTML = ""; // Clear current content
 
-            data.content.forEach((employee, index) => {
-              // 번호 계산
-              const number = page * parseInt(size) + (index + 1);
-              tbody.innerHTML += `
+            if (data.content.length === 0) {
+              // 직원 데이터가 없을 경우
+              tbody.innerHTML = `
+        <tr>
+            <td colspan="5" style="text-align: center; vertical-align: middle; height: 50px;">직원이 존재하지 않습니다.</td>
+        </tr>`;
+            } else {
+              data.content.forEach((employee, index) => {
+                // 번호 계산
+                const number = page * parseInt(size) + (index + 1);
+                tbody.innerHTML += `
                             <tr>
                                 <td>${number}</td>
                                 <td>${employee.id}</td>
@@ -60,7 +82,8 @@
                                 <td>${employee.position}</td>
                                 <td>${employee.department}</td>
                             </tr>`;
-            });
+              });
+            }
 
             const totalPages = data.totalPages;
             updatePagination(page, totalPages);
@@ -76,6 +99,15 @@
 
       function updatePagination(current, total) {
         const pagination = document.querySelector("#pagination");
+
+        if (total === 0) {
+          // 직원 데이터가 없는 경우 페이지네이션을 숨김
+          pagination.style.display = "none";
+          return;
+        } else {
+          pagination.style.display = "";
+        }
+
         const isFirstPage = current === 0;
         const isLastPage = current === total - 1;
 
@@ -142,8 +174,10 @@
 
       // 페이지를 로드할 때 URL의 쿼리 매개변수로부터 페이지 번호를 가져옵니다.
       document.addEventListener("DOMContentLoaded", function () {
-        const sizeFromURL = getSizeFromURL(); //size 값을 읽어옵니다.
-        sizeSelector.value = sizeFromURL; // <select> 값을 해당 size 값으로 설정
+        const sizeFromURL = getSizeFromURL();
+        sizeSelector.value = sizeFromURL;
+        const nameFromURL = getNameFromURL(); // URL에서 이름 값을 가져옵니다.
+        document.getElementById("searchName").value = nameFromURL; // 입력 필드에 이름 값을 설정합니다.
         const pageFromURL = getPageFromURL();
         loadEmployees(pageFromURL);
       });
@@ -153,14 +187,36 @@
   <div layout:fragment="content">
     <h1 class="mb-4">직원 목록</h1>
 
-    <!-- size 선택 옵션 (Bootstrap 스타일로 꾸며진 드롭다운 메뉴) -->
-    <div class="form-group">
-      <label for="sizeSelector">항목 수:</label>
-      <select class="form-control" id="sizeSelector">
-        <option value="3">3개</option>
-        <option value="5">5개</option>
-        <option value="10">10개</option>
-      </select>
+    <a href="/employee/new" class="btn btn-primary">직원 추가하기</a>
+
+    <div class="row my-3 align-items-center">
+      <div class="col-4">
+        <label for="sizeSelector" class="mr-2">항목 수:</label>
+        <select class="form-control d-inline-block w-auto" id="sizeSelector">
+          <option value="3">3개</option>
+          <option value="5">5개</option>
+          <option value="10">10개</option>
+        </select>
+      </div>
+      <div class="col-8">
+        <div class="input-group">
+          <input
+            type="text"
+            class="form-control"
+            id="searchName"
+            placeholder="이름 검색"
+          />
+          <div class="input-group-append">
+            <button
+              class="btn btn-outline-secondary"
+              type="button"
+              id="searchButton"
+            >
+              찾기
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <table class="table table-bordered table-hover" id="employeeTable">

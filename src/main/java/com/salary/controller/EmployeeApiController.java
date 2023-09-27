@@ -32,9 +32,15 @@ public class EmployeeApiController {
 
     // 모든 직원 조회
     @GetMapping("/api/employees")
-    public ResponseEntity<Page<EmployeeResponse>> findAllEmployees(@RequestParam(value = "page", defaultValue = "0") int page,
+    public ResponseEntity<Page<EmployeeResponse>> findAllEmployees(@RequestParam(value = "name", defaultValue = "") String name,
+                                                                   @RequestParam(value = "page", defaultValue = "0") int page,
                                                                    @RequestParam(value = "size", defaultValue = "3") int size) {
-        Page<Employee> employeePage = employeeService.findAll(PageRequest.of(page, size));
+        Page<Employee> employeePage;
+        if (name.isEmpty()) {
+            employeePage = employeeService.findAll(PageRequest.of(page, size));
+        } else {
+            employeePage = employeeService.findByName(name, PageRequest.of(page, size));
+        }
         Page<EmployeeResponse> employees = employeePage.map(EmployeeResponse::new);
         return ResponseEntity.ok().body(employees);
     }

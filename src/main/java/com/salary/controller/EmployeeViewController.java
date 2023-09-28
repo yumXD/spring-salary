@@ -11,4 +11,9 @@ public class EmployeeViewController {
     public String employees() {
         return "employee/employeeMng";
     }
+
+    @GetMapping("/employee/new")
+    public String register() {
+        return "employee/register";
+    }
 }

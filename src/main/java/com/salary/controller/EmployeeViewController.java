@@ -24,4 +24,10 @@ public class EmployeeViewController {
         model.addAttribute("id", id);
         return "employee/employeeDtl";
     }
+
+    @GetMapping("/employee/edit/{id}")
+    public String updateEmployee(@PathVariable("id") Long id, Model model) {
+        model.addAttribute("id", id);
+        return "employee/register";
+    }
 }

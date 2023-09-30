@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface WorkDetailRepository extends JpaRepository<WorkDetail, Long> {
+    WorkDetail findByEmployeeId(Long employeeId);
 }

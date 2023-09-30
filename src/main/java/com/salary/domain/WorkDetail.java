@@ -1,6 +1,7 @@
 package com.salary.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.salary.dto.WorkDetailRequest;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,4 +24,11 @@ public class WorkDetail {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "employee_id")
     private Employee employee;
+
+    public WorkDetail create(WorkDetailRequest workDetailRequest, Employee employee) {
+        this.hourlyRate = workDetailRequest.getHourlyRate();
+        this.setEmployee(employee);
+        employee.setWorkDetail(this);
+        return this;
+    }
 }

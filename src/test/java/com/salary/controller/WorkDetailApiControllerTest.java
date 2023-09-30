@@ -25,6 +25,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -127,5 +128,36 @@ class WorkDetailApiControllerTest {
         //then
         result.andExpect(status().isInternalServerError())
                 .andExpect(jsonPath("$.message").value("이미 근무표가 생성된 상태입니다.[무결성 위반]"));
+    }
+
+    @DisplayName("findWorkDetailByEmployeeId: 특정 직원의 근무표 조회에 성공한다.")
+    @Test
+    public void findWorkDetailByEmployeeId() throws Exception {
+        //given
+        final String url = "/api/employees/{id}/work-detail";
+
+        final String name = "홍길동";
+        final String position = "부장";
+        final String department = "영업부";
+
+        EmployeeRequest employeeRequest = new EmployeeRequest(name, position, department);
+        Employee savedEmployee = employeeRepository.save(employeeRequest.toEntity());
+
+
+        final Long hourlyRate = 9830L;
+
+        WorkDetail workDetail = new WorkDetail();
+        workDetail.setHourlyRate(hourlyRate);
+        workDetail.setEmployee(savedEmployee);
+        workDetailRepository.save(workDetail);
+
+        //when
+        //설정한 내용을 바탕으로 요청 전송
+        final ResultActions resultActions = mockMvc.perform(get(url, savedEmployee.getId()));
+
+        //then
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.hourlyRate").value(hourlyRate));
     }
 }

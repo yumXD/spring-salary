@@ -31,4 +31,8 @@ public class WorkDetail {
         employee.setWorkDetail(this);
         return this;
     }
+
+    public void update(WorkDetailRequest workDetailRequest) {
+        this.hourlyRate = workDetailRequest.getHourlyRate();
+    }
 }

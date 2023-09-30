@@ -36,4 +36,11 @@ public class WorkDetailApiController {
         WorkDetail workDetail = workDetailService.findWorkDetailByEmployeeId(employeeId);
         return ResponseEntity.ok().body(new WorkDetailResponse(workDetail));
     }
+
+    //근무표 수정 (시급 만)
+    @PutMapping
+    public ResponseEntity<WorkDetail> updateWorkDetail(@PathVariable Long employeeId, @Valid @RequestBody WorkDetailRequest workDetailRequest) {
+        WorkDetail workDetail = workDetailService.update(employeeId, workDetailRequest);
+        return ResponseEntity.ok().body(workDetail);
+    }
 }

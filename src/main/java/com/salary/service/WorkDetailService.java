@@ -44,4 +44,12 @@ public class WorkDetailService {
         }
         return workDetail;
     }
+
+    public WorkDetail update(Long employeeId, WorkDetailRequest workDetailRequest) {
+        employeeService.findById(employeeId);
+
+        WorkDetail workDetail = findByEmployeeId(employeeId);
+        workDetail.update(workDetailRequest);
+        return workDetail;
+    }
 }

@@ -25,8 +25,8 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -159,5 +159,49 @@ class WorkDetailApiControllerTest {
         resultActions
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.hourlyRate").value(hourlyRate));
+    }
+
+    @DisplayName("updateWorkDetail: 특정 직원의 근무표 수정에 성공한다.")
+    @Test
+    public void updateWorkDetail() throws Exception {
+        //given
+        final String url = "/api/employees/{id}/work-detail";
+
+        final String name = "홍길동";
+        final String position = "부장";
+        final String department = "영업부";
+
+        final Long hourlyRate = 9830L;
+
+        Employee savedEmployee = employeeRepository.save(new EmployeeRequest(name, position, department).toEntity());
+
+        WorkDetail workDetail = new WorkDetail();
+        workDetail.setHourlyRate(hourlyRate);
+        workDetail.setEmployee(savedEmployee);
+        workDetailRepository.save(workDetail);
+
+        final Long newHourlyRate = 9010L;
+
+        WorkDetailRequest workDetailRequest = new WorkDetailRequest(newHourlyRate);
+
+        // 객체 JSON으로 직렬화
+        final String requestBody = objectMapper.writeValueAsString(workDetailRequest);
+
+        //when
+        //설정한 내용을 바탕으로 요청 전송
+        final ResultActions resultActions = mockMvc.perform(put(url, savedEmployee.getId())
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(requestBody));
+
+        //then
+        resultActions
+                .andExpect(status().isOk());
+
+        List<WorkDetail> workDetails = workDetailRepository.findAll();
+
+        assertThat(workDetails.size()).isEqualTo(1);
+        assertNotNull(workDetails.get(0).getEmployee());
+        assertNull(savedEmployee.getWorkDetail());
+        assertThat(workDetails.get(0).getHourlyRate()).isEqualTo(newHourlyRate);
     }
 }

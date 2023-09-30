@@ -4,6 +4,7 @@ import com.salary.domain.Employee;
 import com.salary.domain.WorkDetail;
 import com.salary.dto.WorkDetailRequest;
 import com.salary.repository.WorkDetailRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -32,5 +33,15 @@ public class WorkDetailService {
         workDetail.create(workDetailRequest, employee);
 
         return workDetailRepository.save(workDetail);
+    }
+
+    public WorkDetail findWorkDetailByEmployeeId(Long employeeId) {
+        employeeService.findById(employeeId);
+
+        WorkDetail workDetail = findByEmployeeId(employeeId);
+        if (workDetail == null) {
+            throw new EntityNotFoundException("근무표가 존재하지 않습니다.");
+        }
+        return workDetail;
     }
 }

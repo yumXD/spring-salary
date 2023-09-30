@@ -2,6 +2,7 @@ package com.salary.controller;
 
 import com.salary.domain.WorkDetail;
 import com.salary.dto.WorkDetailRequest;
+import com.salary.dto.WorkDetailResponse;
 import com.salary.service.WorkDetailService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,5 +28,12 @@ public class WorkDetailApiController {
                 .buildAndExpand(savedWorkDetail.getId())
                 .toUri();
         return ResponseEntity.created(location).body(savedWorkDetail);
+    }
+
+    //근무표 조회
+    @GetMapping
+    public ResponseEntity<WorkDetailResponse> findWorkDetail(@PathVariable Long employeeId) {
+        WorkDetail workDetail = workDetailService.findWorkDetailByEmployeeId(employeeId);
+        return ResponseEntity.ok().body(new WorkDetailResponse(workDetail));
     }
 }

@@ -22,10 +22,6 @@ public class Employee {
     private String position;
     private String department;
 
-    @JsonIgnore
-    @OneToOne(mappedBy = "employee", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private SalaryDetails salaryDetails;
-
     public void update(EmployeeRequest request) {
         this.name = request.getName();
         this.position = request.getPosition();

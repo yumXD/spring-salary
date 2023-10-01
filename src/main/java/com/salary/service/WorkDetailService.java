@@ -52,4 +52,15 @@ public class WorkDetailService {
         workDetail.update(workDetailRequest);
         return workDetail;
     }
+
+    public void deleteByEmployeeId(Long employeeId) {
+        employeeService.findById(employeeId);
+
+        WorkDetail workDetail = findByEmployeeId(employeeId);
+        if (workDetail == null) {
+            throw new EntityNotFoundException("근무표가 존재하지 않습니다.");
+        }
+
+        workDetailRepository.delete(workDetail);
+    }
 }

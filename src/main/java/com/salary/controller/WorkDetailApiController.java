@@ -43,4 +43,12 @@ public class WorkDetailApiController {
         WorkDetail workDetail = workDetailService.update(employeeId, workDetailRequest);
         return ResponseEntity.ok().body(workDetail);
     }
+
+    //근무표 삭제
+    @DeleteMapping
+    public ResponseEntity<Void> deleteWorkDetail(@PathVariable Long employeeId) {
+        workDetailService.deleteByEmployeeId(employeeId);
+        return ResponseEntity.ok()
+                .build();
+    }
 }

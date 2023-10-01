@@ -23,7 +23,7 @@ public class Employee {
     private String department;
 
     @JsonIgnore
-    @OneToOne(mappedBy = "employee", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "employee", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private WorkDetail workDetail;
 
     public void update(EmployeeRequest request) {

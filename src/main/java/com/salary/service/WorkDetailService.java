@@ -57,12 +57,15 @@ public class WorkDetailService {
     }
 
     public void deleteByEmployeeId(Long employeeId) {
-        employeeService.findById(employeeId);
+        Employee employee = employeeService.findById(employeeId);
 
         WorkDetail workDetail = findByEmployeeId(employeeId);
         if (workDetail == null) {
             throw new EntityNotFoundException("근무표가 존재하지 않습니다.");
         }
+
+        // 관계 끊기
+        employee.setWorkDetail(null);
 
         workDetailRepository.delete(workDetail);
     }

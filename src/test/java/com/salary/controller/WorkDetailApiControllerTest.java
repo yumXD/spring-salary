@@ -204,4 +204,35 @@ class WorkDetailApiControllerTest {
         assertNull(savedEmployee.getWorkDetail());
         assertThat(workDetails.get(0).getHourlyRate()).isEqualTo(newHourlyRate);
     }
+
+    @DisplayName("deleteWorkDetail: 특정 직원의 근무표 삭제에 성공한다.")
+    @Test
+    public void deleteWorkDetail() throws Exception {
+        //given
+        final String url = "/api/employees/{id}/work-detail";
+
+        final String name = "홍길동";
+        final String position = "부장";
+        final String department = "영업부";
+
+        final Long hourlyRate = 9830L;
+
+        EmployeeRequest employeeRequest = new EmployeeRequest(name, position, department);
+        Employee savedEmployee = employeeRepository.save(employeeRequest.toEntity());
+
+        WorkDetail workDetail = new WorkDetail();
+        workDetail.setHourlyRate(hourlyRate);
+        workDetail.setEmployee(savedEmployee);
+        workDetailRepository.save(workDetail);
+
+        //when
+        //설정한 내용을 바탕으로 요청 전송
+        mockMvc.perform(delete(url, savedEmployee.getId()))
+                .andExpect(status().isOk());
+
+        //then
+        List<WorkDetail> workDetails = workDetailRepository.findAll();
+
+        assertThat(workDetails).isEmpty();
+    }
 }

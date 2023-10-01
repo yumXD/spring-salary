@@ -49,6 +49,9 @@ public class WorkDetailService {
         employeeService.findById(employeeId);
 
         WorkDetail workDetail = findByEmployeeId(employeeId);
+        if (workDetail == null) {
+            throw new EntityNotFoundException("근무표가 존재하지 않습니다.");
+        }
         workDetail.update(workDetailRequest);
         return workDetail;
     }

@@ -25,6 +25,64 @@
           // 루트 페이지로 강제 리다이렉션
           window.location.href = "/employees";
         });
+
+      // 근무표 수정 버튼 클릭 시 모달 창 표시
+      document
+        .getElementById("edit-WorkDetail-btn")
+        .addEventListener("click", function () {
+          // 현재 시급 값을 모달 입력 필드에 설정
+          const currentHourlyRate =
+            document.getElementById("hourlyRate").textContent;
+          document.getElementById("editHourlyRate").value = currentHourlyRate;
+
+          // 모달 창 표시
+          $("#editWorkDetailModal").modal("show");
+        });
+
+      // 모달 내에서 '변경 저장' 버튼 클릭 시 동작
+      document
+        .getElementById("saveChangesBtn")
+        .addEventListener("click", function () {
+          const newHourlyRate = document.getElementById("editHourlyRate").value;
+
+          // 서버로 수정 요청 보내는 코드 (fetch 등) 여기에 작성...
+          fetch(`/api/employees/${employeeId}/work-detail`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              hourlyRate: document.getElementById("editHourlyRate").value,
+            }),
+          })
+            .then((response) => {
+              if (!response.ok) {
+                return response.json().then((errors) => {
+                  throw errors;
+                });
+              }
+              return response.json();
+            })
+            .then((data) => {
+              alert("근무표가 성공적으로 수정되었습니다.");
+              location.reload();
+            })
+            .catch((errors) => {
+              if (errors.message) {
+                // DataIntegrityViolationException 예외의 경우
+                alert(errors.message);
+              } else {
+                // 유효성 검사 예외 (MethodArgumentNotValidException)의 경우
+                const errorMessage = Object.entries(errors)
+                  .map(([field, error]) => `${field}: ${error}`)
+                  .join("\n");
+                alert(errorMessage);
+              }
+            });
+
+          // 모달 창 닫기
+          $("#editWorkDetailModal").modal("hide");
+        });
     </script>
   </th:block>
 
@@ -43,6 +101,67 @@
                 </td>
               </tbody>
             </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- 근무표 수정 및 삭제 버튼 추가 -->
+    <div class="d-flex justify-content-center mt-4">
+      <button class="btn btn-warning mr-2" id="edit-WorkDetail-btn">
+        근무표 수정
+      </button>
+      <button class="btn btn-danger" id="delete-WorkDetail-btn">
+        근무표 삭제
+      </button>
+    </div>
+
+    <!-- 근무표 수정 모달 -->
+    <div
+      class="modal fade"
+      id="editWorkDetailModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="editWorkDetailModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editWorkDetailModalLabel">
+              근무표 수정
+            </h5>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <!-- 시급 입력 필드 -->
+            <div class="form-group">
+              <label for="editHourlyRate">시급</label>
+              <input
+                type="number"
+                class="form-control"
+                id="editHourlyRate"
+                placeholder="시급을 입력하세요"
+              />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+            >
+              닫기
+            </button>
+            <button type="button" class="btn btn-primary" id="saveChangesBtn">
+              변경 저장하기
+            </button>
           </div>
         </div>
       </div>

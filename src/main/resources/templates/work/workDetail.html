@@ -1,0 +1,51 @@
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{layouts/layout1}"
+>
+  <!-- 사용자 스크립트 추가 -->
+  <th:block layout:fragment="script">
+    <script th:inline="javascript">
+      const employeeId = document.getElementById("employeeId").value;
+      fetch(`/api/employees/${employeeId}/work-detail`)
+        .then((response) => {
+          if (!response.ok) {
+            return response.json().then((errors) => {
+              throw errors;
+            });
+          }
+          return response.json();
+        })
+        .then((data) => {
+          document.getElementById("hourlyRate").textContent = data.hourlyRate;
+          // 추가 필드들도 여기에 추가합니다.
+        })
+        .catch((error) => {
+          alert(error.message || "오류가 발생했습니다.");
+          // 루트 페이지로 강제 리다이렉션
+          window.location.href = "/employees";
+        });
+    </script>
+  </th:block>
+
+  <div layout:fragment="content">
+    <input type="hidden" id="employeeId" th:value="${id}" />
+    <div class="container mt-5">
+      <div class="container mt-5">
+        <div class="row justify-content-center">
+          <div class="col-md-6">
+            <h2 class="mb-4 text-center">근무표</h2>
+            <table class="table table-bordered table-hover">
+              <tbody>
+                <th class="w-25"><strong>시급:</strong></th>
+                <td>
+                  <span id="hourlyRate"></span>
+                </td>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</html>

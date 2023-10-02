@@ -41,4 +41,18 @@ public class WorkLogApiController {
         Page<WorkLogResponse> workLogs = workLogPage.map(WorkLogResponse::new);
         return ResponseEntity.ok().body(workLogs);
     }
+
+    // 특정 근무 기록 조회
+    @GetMapping("/work-log/{workLogId}")
+    public ResponseEntity<WorkLogResponse> findWorkLog(@PathVariable Long employeeId, @PathVariable Long workLogId) {
+        WorkLog workLog = workLogService.findById(employeeId, workLogId);
+        return ResponseEntity.ok().body(new WorkLogResponse(workLog));
+    }
+
+    //특정 근무 기록 수정
+    @PutMapping("/work-log/{workLogId}")
+    public ResponseEntity<WorkLog> updateWorkLog(@PathVariable Long employeeId, @PathVariable Long workLogId, @Valid @RequestBody WorkLogRequest workLogRequest) {
+        WorkLog workLog = workLogService.update(employeeId, workLogId, workLogRequest);
+        return ResponseEntity.ok().body(workLog);
+    }
 }

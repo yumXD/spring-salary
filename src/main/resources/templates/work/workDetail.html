@@ -228,6 +228,11 @@
                         <td>${workLog.endTime}</td>                        
                         <td>${workLog.totalHours}시간 ${workLog.totalMinutes}분</td>
                         <td>${workLog.dailyWage}원</td>
+                        
+        <td>
+            <button data-id="${workLog.id}" class="btn btn-warning edit-btn">수정</button>
+            <button data-id="${workLog.id}" class="btn btn-danger delete-btn">삭제</button>
+        </td>
                     `;
 
                 tbody.appendChild(tr);
@@ -295,6 +300,129 @@
             loadWorkLogs(page, currentSize);
           }
         });
+
+      document
+        .querySelector("#workLogsBody")
+        .addEventListener("click", function (e) {
+          const target = e.target;
+
+          if (target.classList.contains("edit-btn")) {
+            const workLogId = target.getAttribute("data-id");
+
+            // 수정 버튼에 ID 저장
+            document
+              .getElementById("editRecordBtn")
+              .setAttribute("data-id", workLogId);
+
+            $("#editWorkRecordModal").modal("show");
+
+            // 여기에 근무기록 수정 로직을 추가합니다.
+            fetch(
+              `/api/employees/${employeeId}/work-detail/work-log/${workLogId}`
+            )
+              .then((response) => {
+                if (!response.ok) {
+                  return response.json().then((errors) => {
+                    throw errors;
+                  });
+                }
+                return response.json();
+              })
+              .then((data) => {
+                document.getElementById("editWorkDate").value = data.workDate;
+                document.getElementById("editStartTime").value = data.startTime;
+                document.getElementById("editEndTime").value = data.endTime;
+                // 총 시간 설정
+                const totalTime = `${data.totalHours}시간 ${data.totalMinutes}분`;
+                document.getElementById("editTotalTime").value = totalTime;
+                // 추가 필드들도 여기에 추가합니다.
+              })
+              .catch((error) => {
+                alert(error.message || "오류가 발생했습니다.");
+              });
+          }
+
+          if (target.classList.contains("delete-btn")) {
+            const workLogId = target.getAttribute("data-id");
+            // 여기에 근무기록 삭제 로직을 추가합니다.
+            console.log(`Delete WorkLog ID: ${workLogId}`);
+          }
+        });
+
+      const EditToday = new Date();
+      document.getElementById("editWorkDate").max =
+        EditToday.toISOString().split("T")[0];
+
+      const editStartTimeInput = document.getElementById("editStartTime");
+      const editEndTimeInput = document.getElementById("editEndTime");
+      const editTotalTimeInput = document.getElementById("editTotalTime");
+
+      function updateTotalTime2() {
+        if (editStartTimeInput.value && editEndTimeInput.value) {
+          // 두 입력 필드 모두 값을 가지고 있을 경우만 계산
+          const start = editStartTimeInput.value.split(":").map(Number);
+          const end = editEndTimeInput.value.split(":").map(Number);
+
+          const startDate = new Date(1970, 0, 1, start[0], start[1]);
+          const endDate = new Date(1970, 0, 1, end[0], end[1]);
+
+          if (endDate <= startDate) {
+            endDate.setDate(endDate.getDate() + 1); // Add a day if the end time is before start time
+          }
+
+          const difference = new Date(endDate - startDate);
+          const hours = difference.getUTCHours();
+          const minutes = difference.getUTCMinutes();
+
+          editTotalTimeInput.value = `${hours}시간 ${minutes}분`;
+        }
+      }
+
+      editStartTimeInput.addEventListener("change", updateTotalTime2);
+      editEndTimeInput.addEventListener("change", updateTotalTime2);
+
+      // 모달 내에서 '기록 수정하기' 버튼 클릭 시 동작
+      document
+        .getElementById("editRecordBtn")
+        .addEventListener("click", function () {
+          const workLogId = this.getAttribute("data-id"); // 버튼에서 ID 가져오기
+          // 서버로 수정 요청 보내는 코드 (fetch 등) 여기에 작성...
+          fetch(
+            `/api/employees/${employeeId}/work-detail/work-log/${workLogId}`,
+            {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                workDate: document.getElementById("editWorkDate").value,
+                startTime: document.getElementById("editStartTime").value,
+                endTime: document.getElementById("editEndTime").value,
+              }),
+            }
+          )
+            .then((response) => {
+              if (!response.ok) {
+                return response.json().then((errors) => {
+                  throw errors;
+                });
+              }
+              return response.json();
+            })
+            .then((data) => {
+              alert("근무 기록이 성공적으로 수정되었습니다.");
+              location.reload();
+            })
+            .catch((errors) => {
+              const errorMessage = Object.entries(errors)
+                .map(([field, error]) => `${field}: ${error}`)
+                .join("\n");
+              alert(errorMessage);
+            });
+
+          // 모달 창 닫기
+          $("#editWorkRecordModal").modal("hide");
+        });
     </script>
   </th:block>
 
@@ -350,6 +478,7 @@
           <th>종료 시간</th>
           <th>총 시간</th>
           <th>일당</th>
+          <th class="w-25">작업</th>
         </tr>
       </thead>
       <tbody id="workLogsBody"></tbody>
@@ -479,6 +608,75 @@
             </button>
             <button type="button" class="btn btn-primary" id="addRecordBtn">
               기록 추가하기
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 근무기록 수정 모달 -->
+    <div
+      class="modal fade"
+      id="editWorkRecordModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="editWorkRecordModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editWorkRecordModalLabel">
+              근무기록 수정
+            </h5>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <!-- 근무 날짜 입력 필드 -->
+            <div class="form-group">
+              <label for="editWorkDate">근무 날짜</label>
+              <input type="date" class="form-control" id="editWorkDate" />
+            </div>
+
+            <!-- 근무 시작 시간 입력 필드 -->
+            <div class="form-group">
+              <label for="editStartTime">시작 시간</label>
+              <input type="time" class="form-control" id="editStartTime" />
+            </div>
+
+            <!-- 근무 종료 시간 입력 필드 -->
+            <div class="form-group">
+              <label for="editEndTime">종료 시간</label>
+              <input type="time" class="form-control" id="editEndTime" />
+            </div>
+
+            <div class="form-group">
+              <label for="editTotalTime">총 시간</label>
+              <input
+                type="text"
+                id="editTotalTime"
+                class="form-control"
+                readonly
+              />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+            >
+              닫기
+            </button>
+            <button type="button" class="btn btn-primary" id="editRecordBtn">
+              기록 수정하기
             </button>
           </div>
         </div>

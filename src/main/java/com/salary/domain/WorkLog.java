@@ -1,5 +1,6 @@
 package com.salary.domain;
 
+import com.salary.dto.WorkLogRequest;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -52,5 +53,11 @@ public class WorkLog {
     public Long calculateDailyWageForWorkLog() {
         Double hoursWorked = this.getTotalTime().toMinutes() / 60.0;
         return Math.round(workDetail.getHourlyRate() * hoursWorked); // 반올림
+    }
+
+    public void update(WorkLogRequest workLogRequest) {
+        this.workDate = workLogRequest.getWorkDate();
+        this.startTime = workLogRequest.getStartTime();
+        this.endTime = workLogRequest.getEndTime();
     }
 }

@@ -7,6 +7,9 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "work_detail")
 @Getter
@@ -24,6 +27,10 @@ public class WorkDetail {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "employee_id")
     private Employee employee;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "workDetail", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<WorkLog> workLogs = new ArrayList<>();
 
     public WorkDetail create(WorkDetailRequest workDetailRequest, Employee employee) {
         this.hourlyRate = workDetailRequest.getHourlyRate();

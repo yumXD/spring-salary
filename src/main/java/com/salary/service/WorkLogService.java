@@ -43,4 +43,13 @@ public class WorkLogService {
         workLog.update(workLogRequest);
         return workLog;
     }
+
+    public void delete(Long employeeId, Long workLogId) {
+        WorkDetail workDetail = workDetailService.findWorkDetailByEmployeeId(employeeId);
+        WorkLog workLog = workLogRepository.findById(workLogId).orElseThrow(() -> new EntityNotFoundException("근무 기록이 존재하지 않습니다."));
+
+        //workDetail.getWorkLogs().remove(workLog);
+
+        workLogRepository.delete(workLog);
+    }
 }

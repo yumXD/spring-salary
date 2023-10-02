@@ -55,4 +55,12 @@ public class WorkLogApiController {
         WorkLog workLog = workLogService.update(employeeId, workLogId, workLogRequest);
         return ResponseEntity.ok().body(workLog);
     }
+
+    //특정 근무 기록 삭제
+    @DeleteMapping("/work-log/{workLogId}")
+    public ResponseEntity<Void> deleteWorkLog(@PathVariable Long employeeId, @PathVariable Long workLogId) {
+        workLogService.delete(employeeId, workLogId);
+        return ResponseEntity.ok()
+                .build();
+    }
 }

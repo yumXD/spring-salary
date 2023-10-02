@@ -2,9 +2,12 @@ package com.salary.controller;
 
 import com.salary.domain.WorkLog;
 import com.salary.dto.WorkLogRequest;
+import com.salary.dto.WorkLogResponse;
 import com.salary.service.WorkLogService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -26,5 +29,16 @@ public class WorkLogApiController {
                 .buildAndExpand(savedWorkLog.getId())
                 .toUri();
         return ResponseEntity.created(location).body(savedWorkLog);
+    }
+
+    // 모든 근무 기록 조회
+    @GetMapping("/work-log")
+    public ResponseEntity<Page<WorkLogResponse>> findAllWorkLogs(@PathVariable Long employeeId,
+                                                                 @RequestParam(value = "page", defaultValue = "0") int page,
+                                                                 @RequestParam(value = "size", defaultValue = "3") int size) {
+        Page<WorkLog> workLogPage = workLogService.findAll(employeeId, PageRequest.of(page, size));
+
+        Page<WorkLogResponse> workLogs = workLogPage.map(WorkLogResponse::new);
+        return ResponseEntity.ok().body(workLogs);
     }
 }

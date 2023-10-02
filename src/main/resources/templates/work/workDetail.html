@@ -184,6 +184,117 @@
 
       startTimeInput.addEventListener("change", updateTotalTime);
       endTimeInput.addEventListener("change", updateTotalTime);
+
+      document
+        .getElementById("sizeSelector")
+        .addEventListener("change", function () {
+          size = parseInt(document.getElementById("sizeSelector").value);
+          loadWorkLogs(0, size); // 페이지는 0(첫 페이지)에서 시작하고 선택된 크기로 로드
+        });
+
+      function loadWorkLogs(page = 0, size = 3) {
+        fetch(
+          `/api/employees/${employeeId}/work-detail/work-log?page=${page}&size=${size}`
+        )
+          .then((response) => response.json())
+          .then((data) => {
+            // ... 근무 기록을 테이블에 추가하는 코드 ...
+            const tbody = document.getElementById("workLogsBody");
+            tbody.innerHTML = ""; // 기존 데이터 삭제
+
+            if (data.content.length === 0) {
+              // 근무 기록이 없는 경우
+              const tr = document.createElement("tr");
+              const td = document.createElement("td");
+
+              td.setAttribute("colspan", "3");
+              td.textContent = "근무기록이 존재하지 않습니다.";
+              td.style.textAlign = "center";
+
+              tr.appendChild(td);
+              tbody.appendChild(tr);
+            } else {
+              // 근무 기록이 있는 경우
+              data.content.forEach((workLog, index) => {
+                // 번호 계산
+                const number = page * parseInt(size) + (index + 1);
+                const tr = document.createElement("tr");
+
+                tr.innerHTML = `
+                        <td>${number}</td>
+                        <td>${workLog.id}</td>
+                        <td>${workLog.workDate}</td>
+                        <td>${workLog.startTime}</td>
+                        <td>${workLog.endTime}</td>                        
+                        <td>${workLog.totalHours}시간 ${workLog.totalMinutes}분</td>
+                        <td>${workLog.dailyWage}원</td>
+                    `;
+
+                tbody.appendChild(tr);
+              });
+            }
+
+            // 페이지네이션 업데이트
+            const totalPages = data.totalPages;
+            const pagination = document.getElementById("pagination");
+            pagination.innerHTML = ""; // 기존 페이지네이션 삭제
+
+            // 근무기록이 있을 때만 페이지네이션 생성
+            if (totalPages > 0) {
+              // 첫 페이지와 이전 버튼 생성
+              let btn = `<li class="page-item ${
+                page == 0 ? "disabled" : ""
+              }"><a class="page-link" data-page="0" href="javascript:void(0)">첫 페이지</a></li>`;
+              btn += `<li class="page-item ${
+                page == 0 ? "disabled" : ""
+              }"><a class="page-link" data-page="${
+                page - 1
+              }" href="javascript:void(0)">이전</a></li>`;
+              pagination.innerHTML += btn;
+
+              // 시작 페이지와 종료 페이지 계산
+              let startPage = Math.max(0, page - 2);
+              let endPage = Math.min(totalPages - 1, page + 2);
+
+              for (let i = startPage; i <= endPage; i++) {
+                const activeClass = i == page ? "active" : "";
+                pagination.innerHTML += `<li class="page-item ${activeClass}"><a class="page-link" data-page="${i}" href="javascript:void(0)">${
+                  i + 1
+                }</a></li>`;
+              }
+
+              // 다음 페이지와 마지막 페이지 버튼 생성
+              btn = `<li class="page-item ${
+                page == totalPages - 1 ? "disabled" : ""
+              }"><a class="page-link" data-page="${
+                page + 1
+              }" href="javascript:void(0)">다음</a></li>`;
+              btn += `<li class="page-item ${
+                page == totalPages - 1 ? "disabled" : ""
+              }"><a class="page-link" data-page="${
+                totalPages - 1
+              }" href="javascript:void(0)">마지막 페이지</a></li>`;
+              pagination.innerHTML += btn;
+            }
+          });
+      }
+
+      // 처음 페이지 로드 시 근무 기록 로드
+      loadWorkLogs();
+
+      // 페이지네이션 버튼 클릭 이벤트 추가
+      document
+        .getElementById("pagination")
+        .addEventListener("click", function (e) {
+          e.preventDefault(); // 기본 이벤트 중지
+          if (e.target.tagName === "A") {
+            const page = parseInt(e.target.getAttribute("data-page"));
+            const currentSize = parseInt(
+              document.getElementById("sizeSelector").value
+            );
+            loadWorkLogs(page, currentSize);
+          }
+        });
     </script>
   </th:block>
 
@@ -215,6 +326,41 @@
         근무표 삭제
       </button>
     </div>
+
+    <div class="row my-3 align-items-center">
+      <div class="col-4">
+        <label for="sizeSelector" class="mr-2">항목 수:</label>
+        <select class="form-control d-inline-block w-auto" id="sizeSelector">
+          <option value="3" selected>3개</option>
+          <option value="5">5개</option>
+          <option value="10">10개</option>
+        </select>
+      </div>
+      <!-- 원하시면 -->
+    </div>
+
+    <!-- 근무기록 표시 영역 -->
+    <table class="table table-bordered table-hover">
+      <thead>
+        <tr>
+          <th>번호</th>
+          <th>아이디</th>
+          <th>근무 날짜</th>
+          <th>시작 시간</th>
+          <th>종료 시간</th>
+          <th>총 시간</th>
+          <th>일당</th>
+        </tr>
+      </thead>
+      <tbody id="workLogsBody"></tbody>
+    </table>
+
+    <!-- 페이지네이션 영역 -->
+    <nav aria-label="Page navigation">
+      <ul class="pagination" id="pagination">
+        <!-- 페이지네이션 버튼이 이곳에 추가됩니다. -->
+      </ul>
+    </nav>
 
     <!-- 근무기록 추가 버튼 -->
     <div class="d-flex justify-content-center mt-4">

@@ -30,6 +30,6 @@ public class WorkLogResponse {
         this.endTime = workLog.getEndTime();
         this.totalHours = workLog.getTotalTime().toHours();
         this.totalMinutes = workLog.getTotalTime().toMinutesPart();
-        this.dailyWage = workLog.calculateDailyWageForWorkLog();
+        this.dailyWage = workLog.getDailyWage();
     }
 }

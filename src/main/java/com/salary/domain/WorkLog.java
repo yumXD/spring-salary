@@ -50,7 +50,7 @@ public class WorkLog {
         return Duration.between(startTime, endTime);
     }
 
-    public Long calculateDailyWageForWorkLog() {
+    public Long getDailyWage() {
         Double hoursWorked = this.getTotalTime().toMinutes() / 60.0;
         return Math.round(workDetail.getHourlyRate() * hoursWorked); // 반올림
     }

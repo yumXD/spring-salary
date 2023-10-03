@@ -18,6 +18,9 @@
         })
         .then((data) => {
           document.getElementById("hourlyRate").textContent = data.hourlyRate;
+          document.getElementById("totalWorkCount").textContent =
+            data.totalWorkCount;
+          document.getElementById("totalSalary").textContent = data.totalSalary;
           // 추가 필드들도 여기에 추가합니다.
         })
         .catch((error) => {
@@ -454,10 +457,20 @@
             <h2 class="mb-4 text-center">근무표</h2>
             <table class="table table-bordered table-hover">
               <tbody>
-                <th class="w-25"><strong>시급:</strong></th>
-                <td>
-                  <span id="hourlyRate"></span>
-                </td>
+                <tr>
+                  <th class="w-50"><strong>시급:</strong></th>
+                  <td><span id="hourlyRate"></span></td>
+                </tr>
+                <tr>
+                  <!-- 근무 총 횟수 행 추가 -->
+                  <th class="w-50"><strong>근무 총 횟수:</strong></th>
+                  <td><span id="totalWorkCount"></span></td>
+                </tr>
+                <tr>
+                  <!-- 근무 총 급여 행 추가 -->
+                  <th class="w-50"><strong>근무 총 급여:</strong></th>
+                  <td><span id="totalSalary"></span></td>
+                </tr>
               </tbody>
             </table>
           </div>

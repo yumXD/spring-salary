@@ -42,4 +42,12 @@ public class WorkDetail {
     public void update(WorkDetailRequest workDetailRequest) {
         this.hourlyRate = workDetailRequest.getHourlyRate();
     }
+
+    public int getTotalWorkCount() {
+        return workLogs.size();
+    }
+
+    public Long getTotalSalary() {
+        return workLogs.stream().mapToLong(WorkLog::getDailyWage).sum();
+    }
 }

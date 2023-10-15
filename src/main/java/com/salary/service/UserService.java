@@ -2,6 +2,7 @@ package com.salary.service;
 
 import com.salary.domain.User;
 import com.salary.dto.UserRequest;
+import com.salary.exception.DuplicateEmailException;
 import com.salary.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +31,7 @@ public class UserService {
     private void validateDuplicateEmail(String email) {
         User findUser = userRepository.findByEmail(email);
         if (findUser != null) {
-            throw new IllegalStateException("이미 가입된 이메일입니다.");
+            throw new DuplicateEmailException("이미 가입된 이메일입니다.");
         }
     }
 
@@ -49,6 +50,7 @@ public class UserService {
     }
 
     public void delete(Long id) {
+        findById(id);
         userRepository.deleteById(id);
     }
 

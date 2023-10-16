@@ -9,9 +9,7 @@
       fetch("/api/employees/" + employeeId)
         .then((response) => {
           if (!response.ok) {
-            return response.json().then((errors) => {
-              throw errors;
-            });
+            throw new Error("오류가 발생했습니다.");
           }
           return response.json();
         })
@@ -22,9 +20,8 @@
           // 추가 필드들도 여기에 추가합니다.
         })
         .catch((error) => {
-          alert(error.message || "오류가 발생했습니다.");
-          // 루트 페이지로 강제 리다이렉션
-          window.location.href = "/";
+          alert(error);
+          location.replace(`/employees`);
         });
 
       const createWorkDetail = document.getElementById("create-WorkDetail-btn");
@@ -41,27 +38,18 @@
         })
           .then((response) => {
             if (!response.ok) {
-              return response.json().then((errors) => {
-                throw errors;
+              return response.json().then((error) => {
+                throw new Error(error.message);
               });
             }
             return response.json();
           })
           .then((data) => {
-            alert("근무표가 성공적으로 생성되었습니다.");
+            alert("근무표가 생성되었습니다.");
             location.reload();
           })
-          .catch((errors) => {
-            if (errors.message) {
-              // DataIntegrityViolationException 예외의 경우
-              alert(errors.message);
-            } else {
-              // 유효성 검사 예외 (MethodArgumentNotValidException)의 경우
-              const errorMessage = Object.entries(errors)
-                .map(([field, error]) => `${field}: ${error}`)
-                .join("\n");
-              alert(errorMessage);
-            }
+          .catch((error) => {
+            alert(error);
           });
       });
 

@@ -44,24 +44,9 @@
           })
             .then((response) => {
               if (!response.ok) {
-                if (response.status === 409) {
-                  // 이메일 중복 오류 처리
-                  return response.json().then((error) => {
-                    throw new Error(error.message);
-                  });
-                } else {
-                  // 다른 오류 처리
-                  return response.json().then((error) => {
-                    if (Array.isArray(error)) {
-                      // 오류가 배열 형태로 제공된다고 가정
-                      const errorMessages = error.map((e) => e.defaultMessage);
-                      throw new Error(errorMessages.join("\n")); // 각 오류 메시지를 개행 문자로 구분하여 표시
-                    } else {
-                      // 오류가 단일 오류 메시지로 제공된다고 가정
-                      throw new Error(error.message);
-                    }
-                  });
-                }
+                return response.json().then((error) => {
+                  throw new Error(error.message);
+                });
               }
               return response.json();
             })
@@ -93,12 +78,7 @@
             .then((response) => {
               if (!response.ok) {
                 return response.json().then((error) => {
-                  if (Array.isArray(error)) {
-                    const errorMessages = error.map((e) => e.defaultMessage);
-                    throw new Error(errorMessages.join("\n"));
-                  } else {
-                    throw new Error(error.message);
-                  }
+                  throw new Error(error.message);
                 });
               }
               return response.json();
@@ -118,24 +98,6 @@
               alert(error);
             });
         });
-      }
-
-      function displayErrors(errors) {
-        // 기존의 오류 메시지를 모두 삭제합니다.
-        const existingErrorElements =
-          document.querySelectorAll(".error-message");
-        existingErrorElements.forEach((el) => el.remove());
-
-        const globalErrorContainer = document.getElementById(
-          "global-error-container"
-        );
-
-        for (const [key, value] of Object.entries(errors)) {
-          const errorElement = document.createElement("div");
-          errorElement.className = "error-message alert alert-danger mt-2";
-          errorElement.textContent = `${key}: ${value}`;
-          globalErrorContainer.appendChild(errorElement);
-        }
       }
 
       const deleteButton = document.getElementById("delete-btn");

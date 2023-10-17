@@ -26,7 +26,7 @@ public class WorkDetailService {
         Employee employee = employeeService.findById(employeeId);
 
         if (findByEmployeeId(employeeId) != null) {
-            throw new DataIntegrityViolationException("이미 근무표가 생성된 상태입니다.[무결성 위반]");
+            throw new DataIntegrityViolationException("이미 근무표가 생성된 상태입니다.");
         }
 
         WorkDetail workDetail = new WorkDetail();

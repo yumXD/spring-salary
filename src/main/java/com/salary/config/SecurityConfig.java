@@ -3,7 +3,6 @@ package com.salary.config;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -39,13 +38,26 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers("/css/**", "/js/**", "/img/**", "/", "/images/**").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
-                                .requestMatchers("/users/**").permitAll()
-                                .requestMatchers("/admin/**").hasRole("ADMIN")
+                                .requestMatchers(
+                                        new AntPathRequestMatcher("/css/**"),
+                                        new AntPathRequestMatcher("/js/**"),
+                                        new AntPathRequestMatcher("/img/**"),
+                                        new AntPathRequestMatcher("/images/**")
+                                ).permitAll()
+                                .requestMatchers(
+                                        new AntPathRequestMatcher("/"),
+                                        new AntPathRequestMatcher("/users/**")
+                                ).permitAll()
+                                .requestMatchers(
+                                        new AntPathRequestMatcher("/api/users", "POST")
+                                ).permitAll()
+                                .requestMatchers(
+                                        new AntPathRequestMatcher("/admin/**")
+                                ).hasRole("ADMIN")
                                 .anyRequest().authenticated()
                 )
         ;
+
         return http.build();
     }
 

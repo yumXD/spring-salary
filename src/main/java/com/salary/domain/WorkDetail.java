@@ -32,8 +32,15 @@ public class WorkDetail {
     @OneToMany(mappedBy = "workDetail", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<WorkLog> workLogs = new ArrayList<>();
 
-    public WorkDetail create(WorkDetailRequest workDetailRequest, Employee employee) {
-        this.hourlyRate = workDetailRequest.getHourlyRate();
+//    public WorkDetail create(WorkDetailRequest workDetailRequest, Employee employee) {
+//        this.hourlyRate = workDetailRequest.getHourlyRate();
+//        this.setEmployee(employee);
+//        employee.setWorkDetail(this);
+//        return this;
+//    }
+
+    public WorkDetail create(Long hourlyWage, Employee employee) {
+        this.hourlyRate = hourlyWage;
         this.setEmployee(employee);
         employee.setWorkDetail(this);
         return this;

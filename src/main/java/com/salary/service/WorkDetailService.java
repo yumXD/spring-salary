@@ -6,7 +6,6 @@ import com.salary.dto.WorkDetailRequest;
 import com.salary.repository.WorkDetailRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,15 +21,24 @@ public class WorkDetailService {
         return workDetailRepository.findByEmployeeId(employeeId);
     }
 
-    public WorkDetail createWorkDetail(Long employeeId, WorkDetailRequest workDetailRequest) {
+//    public WorkDetail createWorkDetail(Long employeeId, WorkDetailRequest workDetailRequest) {
+//        Employee employee = employeeService.findById(employeeId);
+//
+//        if (findByEmployeeId(employeeId) != null) {
+//            throw new DataIntegrityViolationException("이미 근무표가 생성된 상태입니다.");
+//        }
+//
+//        WorkDetail workDetail = new WorkDetail();
+//        workDetail.create(workDetailRequest, employee);
+//
+//        return workDetailRepository.save(workDetail);
+//    }
+
+    public WorkDetail createWorkDetail(Long employeeId, Long hourlyWage) {
         Employee employee = employeeService.findById(employeeId);
 
-        if (findByEmployeeId(employeeId) != null) {
-            throw new DataIntegrityViolationException("이미 근무표가 생성된 상태입니다.");
-        }
-
         WorkDetail workDetail = new WorkDetail();
-        workDetail.create(workDetailRequest, employee);
+        workDetail.create(hourlyWage, employee);
 
         return workDetailRepository.save(workDetail);
     }

@@ -18,17 +18,6 @@ public class WorkDetailApiController {
 
     private final WorkDetailService workDetailService;
 
-//    @PostMapping
-//    public ResponseEntity<WorkDetail> createWorkDetail(@PathVariable Long employeeId, @Valid @RequestBody WorkDetailRequest workDetailRequest) {
-//        WorkDetail savedWorkDetail = workDetailService.createWorkDetail(employeeId, workDetailRequest);
-//        log.info("{} 님 근무표 생성 완료", savedWorkDetail.getEmployee().getName());
-//        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-//                .path("/{id}")
-//                .buildAndExpand(savedWorkDetail.getId())
-//                .toUri();
-//        return ResponseEntity.created(location).body(savedWorkDetail);
-//    }
-
     @GetMapping
     public ResponseEntity<WorkDetailResponse> findWorkDetail(@PathVariable Long employeeId) {
         WorkDetail workDetail = workDetailService.findWorkDetailByEmployeeId(employeeId);

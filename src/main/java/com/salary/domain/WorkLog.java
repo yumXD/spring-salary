@@ -29,8 +29,8 @@ public class WorkLog {
     private LocalTime endTime; // 종료 시간
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "work_detail_id")
-    private WorkDetail workDetail;
+    @JoinColumn(name = "wage_id")
+    private Wage wage;
 
     public Duration getTotalTime() {
         if (endTime.isBefore(startTime)) {
@@ -52,7 +52,7 @@ public class WorkLog {
 
     public Long getDailyWage() {
         Double hoursWorked = this.getTotalTime().toMinutes() / 60.0;
-        return Math.round(workDetail.getHourlyRate() * hoursWorked); // 반올림
+        return Math.round(wage.getHourlyRate() * hoursWorked); // 반올림
     }
 
     public void update(WorkLogRequest workLogRequest) {

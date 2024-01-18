@@ -1,7 +1,7 @@
 package com.salary.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.salary.dto.WorkDetailRequest;
+import com.salary.dto.WageRequest;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,13 +11,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "work_detail")
+@Table(name = "wage")
 @Getter
 @Setter
 @ToString
-public class WorkDetail {
+public class Wage {
     @Id
-    @Column(name = "work_detail_id")
+    @Column(name = "wage_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -29,18 +29,18 @@ public class WorkDetail {
     private Employee employee;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "workDetail", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(mappedBy = "wage", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<WorkLog> workLogs = new ArrayList<>();
 
-    public WorkDetail create(Long hourlyWage, Employee employee) {
+    public Wage create(Long hourlyWage, Employee employee) {
         this.hourlyRate = hourlyWage;
         this.setEmployee(employee);
-        employee.setWorkDetail(this);
+        employee.setWage(this);
         return this;
     }
 
-    public void update(WorkDetailRequest workDetailRequest) {
-        this.hourlyRate = workDetailRequest.getHourlyRate();
+    public void update(WageRequest wageRequest) {
+        this.hourlyRate = wageRequest.getHourlyRate();
     }
 
     public int getTotalWorkCount() {

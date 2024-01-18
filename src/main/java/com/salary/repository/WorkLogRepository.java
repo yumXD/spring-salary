@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface WorkLogRepository extends JpaRepository<WorkLog, Long> {
-    Page<WorkLog> findAllByWorkDetailId(Long workDetailId, Pageable pageable);
+    Page<WorkLog> findAllByWageId(Long wageId, Pageable pageable);
 }

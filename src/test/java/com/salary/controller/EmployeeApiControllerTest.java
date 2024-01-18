@@ -77,7 +77,7 @@ class EmployeeApiControllerTest {
         List<Employee> employees = employeeRepository.findAll();
 
         assertThat(employees.size()).isEqualTo(1);
-        assertNull(employees.get(0).getWorkDetail());
+        assertNull(employees.get(0).getWage());
         assertThat(employees.get(0).getName()).isEqualTo(name);
         assertThat(employees.get(0).getPosition()).isEqualTo(position);
         assertThat(employees.get(0).getDepartment()).isEqualTo(department);
@@ -169,7 +169,7 @@ class EmployeeApiControllerTest {
         List<Employee> employees = employeeRepository.findAll();
 
         assertThat(employees.size()).isEqualTo(1);
-        assertNull(employees.get(0).getWorkDetail());
+        assertNull(employees.get(0).getWage());
         assertThat(employees.get(0).getName()).isEqualTo(newName);
         assertThat(employees.get(0).getPosition()).isEqualTo(newPosition);
         assertThat(employees.get(0).getDepartment()).isEqualTo(newDepartment);

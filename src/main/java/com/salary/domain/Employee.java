@@ -24,7 +24,7 @@ public class Employee {
 
     @JsonIgnore
     @OneToOne(mappedBy = "employee", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    private WorkDetail workDetail;
+    private Wage wage;
 
     public void update(EmployeeRequest request) {
         this.name = request.getName();

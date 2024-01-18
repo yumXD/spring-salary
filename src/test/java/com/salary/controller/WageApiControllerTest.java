@@ -2,11 +2,11 @@ package com.salary.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.salary.domain.Employee;
-import com.salary.domain.WorkDetail;
+import com.salary.domain.Wage;
 import com.salary.dto.EmployeeRequest;
-import com.salary.dto.WorkDetailRequest;
+import com.salary.dto.WageRequest;
 import com.salary.repository.EmployeeRepository;
-import com.salary.repository.WorkDetailRepository;
+import com.salary.repository.WageRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -34,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @Transactional
 @TestPropertySource(locations = "classpath:application-test.properties")
-class WorkDetailApiControllerTest {
+class WageApiControllerTest {
     @Autowired
     protected MockMvc mockMvc;
 
@@ -48,7 +48,7 @@ class WorkDetailApiControllerTest {
     EmployeeRepository employeeRepository;
 
     @Autowired
-    WorkDetailRepository workDetailRepository;
+    WageRepository wageRepository;
 
     @BeforeEach
     public void mockMvcSetUp() {
@@ -70,10 +70,10 @@ class WorkDetailApiControllerTest {
 
         final Long hourlyRate = 9830L;
 
-        WorkDetailRequest workDetailRequest = new WorkDetailRequest(hourlyRate);
+        WageRequest wageRequest = new WageRequest(hourlyRate);
 
         // 객체 JSON으로 직렬화
-        final String requestBody = objectMapper.writeValueAsString(workDetailRequest);
+        final String requestBody = objectMapper.writeValueAsString(wageRequest);
 
         //when
         //설정한 내용을 바탕으로 요청 전송
@@ -87,11 +87,11 @@ class WorkDetailApiControllerTest {
                 .andExpect(jsonPath("$.id").isNotEmpty())
                 .andExpect(jsonPath("$.hourlyRate").value(hourlyRate));
 
-        List<WorkDetail> workDetails = workDetailRepository.findAll();
+        List<Wage> wages = wageRepository.findAll();
 
-        assertThat(workDetails.size()).isEqualTo(1);
-        assertNotNull(workDetails.get(0).getEmployee());
-        assertThat(workDetails.get(0).getHourlyRate()).isEqualTo(hourlyRate);
+        assertThat(wages.size()).isEqualTo(1);
+        assertNotNull(wages.get(0).getEmployee());
+        assertThat(wages.get(0).getHourlyRate()).isEqualTo(hourlyRate);
     }
 
     @DisplayName("createWorkDetail_AlreadyExists: 근무표 생성 실패시 예외를 발생한다.")
@@ -109,15 +109,15 @@ class WorkDetailApiControllerTest {
 
         final Long hourlyRate = 9830L;
 
-        WorkDetail workDetail = new WorkDetail();
-        workDetail.setHourlyRate(10000L);
-        workDetail.setEmployee(savedEmployee);
-        workDetailRepository.save(workDetail);
+        Wage wage = new Wage();
+        wage.setHourlyRate(10000L);
+        wage.setEmployee(savedEmployee);
+        wageRepository.save(wage);
 
-        WorkDetailRequest workDetailRequest = new WorkDetailRequest(hourlyRate);
+        WageRequest wageRequest = new WageRequest(hourlyRate);
 
         // 객체 JSON으로 직렬화
-        final String requestBody = objectMapper.writeValueAsString(workDetailRequest);
+        final String requestBody = objectMapper.writeValueAsString(wageRequest);
 
         //when
         //설정한 내용을 바탕으로 요청 전송
@@ -146,10 +146,10 @@ class WorkDetailApiControllerTest {
 
         final Long hourlyRate = 9830L;
 
-        WorkDetail workDetail = new WorkDetail();
-        workDetail.setHourlyRate(hourlyRate);
-        workDetail.setEmployee(savedEmployee);
-        workDetailRepository.save(workDetail);
+        Wage wage = new Wage();
+        wage.setHourlyRate(hourlyRate);
+        wage.setEmployee(savedEmployee);
+        wageRepository.save(wage);
 
         //when
         //설정한 내용을 바탕으로 요청 전송
@@ -175,17 +175,17 @@ class WorkDetailApiControllerTest {
 
         Employee savedEmployee = employeeRepository.save(new EmployeeRequest(name, position, department).toEntity());
 
-        WorkDetail workDetail = new WorkDetail();
-        workDetail.setHourlyRate(hourlyRate);
-        workDetail.setEmployee(savedEmployee);
-        workDetailRepository.save(workDetail);
+        Wage wage = new Wage();
+        wage.setHourlyRate(hourlyRate);
+        wage.setEmployee(savedEmployee);
+        wageRepository.save(wage);
 
         final Long newHourlyRate = 9010L;
 
-        WorkDetailRequest workDetailRequest = new WorkDetailRequest(newHourlyRate);
+        WageRequest wageRequest = new WageRequest(newHourlyRate);
 
         // 객체 JSON으로 직렬화
-        final String requestBody = objectMapper.writeValueAsString(workDetailRequest);
+        final String requestBody = objectMapper.writeValueAsString(wageRequest);
 
         //when
         //설정한 내용을 바탕으로 요청 전송
@@ -197,12 +197,12 @@ class WorkDetailApiControllerTest {
         resultActions
                 .andExpect(status().isOk());
 
-        List<WorkDetail> workDetails = workDetailRepository.findAll();
+        List<Wage> wages = wageRepository.findAll();
 
-        assertThat(workDetails.size()).isEqualTo(1);
-        assertNotNull(workDetails.get(0).getEmployee());
-        assertNull(savedEmployee.getWorkDetail());
-        assertThat(workDetails.get(0).getHourlyRate()).isEqualTo(newHourlyRate);
+        assertThat(wages.size()).isEqualTo(1);
+        assertNotNull(wages.get(0).getEmployee());
+        assertNull(savedEmployee.getWage());
+        assertThat(wages.get(0).getHourlyRate()).isEqualTo(newHourlyRate);
     }
 
     @DisplayName("deleteWorkDetail: 특정 직원의 근무표 삭제에 성공한다.")
@@ -220,10 +220,10 @@ class WorkDetailApiControllerTest {
         EmployeeRequest employeeRequest = new EmployeeRequest(name, position, department);
         Employee savedEmployee = employeeRepository.save(employeeRequest.toEntity());
 
-        WorkDetail workDetail = new WorkDetail();
-        workDetail.setHourlyRate(hourlyRate);
-        workDetail.setEmployee(savedEmployee);
-        workDetailRepository.save(workDetail);
+        Wage wage = new Wage();
+        wage.setHourlyRate(hourlyRate);
+        wage.setEmployee(savedEmployee);
+        wageRepository.save(wage);
 
         //when
         //설정한 내용을 바탕으로 요청 전송
@@ -231,8 +231,8 @@ class WorkDetailApiControllerTest {
                 .andExpect(status().isOk());
 
         //then
-        List<WorkDetail> workDetails = workDetailRepository.findAll();
+        List<Wage> wages = wageRepository.findAll();
 
-        assertThat(workDetails).isEmpty();
+        assertThat(wages).isEmpty();
     }
 }

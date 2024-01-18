@@ -25,7 +25,7 @@ public class WorkLogApiController {
     @PostMapping
     public ResponseEntity<WorkLog> createWorkLog(@PathVariable Long employeeId, @Valid @RequestBody WorkLogRequest workLogRequest) {
         WorkLog savedWorkLog = workLogService.createWorkLog(employeeId, workLogRequest);
-        log.info("{} 님 근무 기록 추가 완료", savedWorkLog.getWorkDetail().getEmployee().getName());
+        log.info("{} 님 근무 기록 추가 완료", savedWorkLog.getWage().getEmployee().getName());
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(savedWorkLog.getId())
@@ -46,14 +46,14 @@ public class WorkLogApiController {
     @GetMapping("/{workLogId}")
     public ResponseEntity<WorkLogResponse> findWorkLog(@PathVariable Long employeeId, @PathVariable Long workLogId) {
         WorkLog workLog = workLogService.findById(employeeId, workLogId);
-        log.info("{} 님 근무 기록 상세 조회 완료", workLog.getWorkDetail().getEmployee().getName());
+        log.info("{} 님 근무 기록 상세 조회 완료", workLog.getWage().getEmployee().getName());
         return ResponseEntity.ok().body(new WorkLogResponse(workLog));
     }
 
     @PutMapping("/{workLogId}")
     public ResponseEntity<WorkLog> updateWorkLog(@PathVariable Long employeeId, @PathVariable Long workLogId, @Valid @RequestBody WorkLogRequest workLogRequest) {
         WorkLog workLog = workLogService.update(employeeId, workLogId, workLogRequest);
-        log.info("{} 님 근무 기록 수정 완료", workLog.getWorkDetail().getEmployee().getName());
+        log.info("{} 님 근무 기록 수정 완료", workLog.getWage().getEmployee().getName());
         return ResponseEntity.ok().body(workLog);
     }
 

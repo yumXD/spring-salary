@@ -1,6 +1,6 @@
 package com.salary.dto;
 
-import com.salary.domain.WorkLog;
+import com.salary.domain.Work;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
@@ -16,7 +16,7 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class WorkLogRequest {
+public class WorkRequest {
     @NotNull(message = "근무 날짜는 필수 입력값 입니다.")
     @PastOrPresent(message = "근무 날짜는 오늘 이후일 수 없습니다.")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
@@ -45,11 +45,11 @@ public class WorkLogRequest {
     }
 
 
-    public WorkLog toEntity() {
-        WorkLog workLog = new WorkLog();
-        workLog.setWorkDate(workDate);
-        workLog.setStartTime(startTime);
-        workLog.setEndTime(endTime);
-        return workLog;
+    public Work toEntity() {
+        Work work = new Work();
+        work.setWorkDate(workDate);
+        work.setStartTime(startTime);
+        work.setEndTime(endTime);
+        return work;
     }
 }

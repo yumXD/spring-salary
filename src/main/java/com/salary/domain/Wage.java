@@ -30,7 +30,7 @@ public class Wage {
 
     @JsonIgnore
     @OneToMany(mappedBy = "wage", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    private List<WorkLog> workLogs = new ArrayList<>();
+    private List<Work> works = new ArrayList<>();
 
     public Wage create(Long hourlyWage, Employee employee) {
         this.hourlyRate = hourlyWage;
@@ -44,10 +44,10 @@ public class Wage {
     }
 
     public int getTotalWorkCount() {
-        return workLogs.size();
+        return works.size();
     }
 
     public Long getTotalSalary() {
-        return workLogs.stream().mapToLong(WorkLog::getDailyWage).sum();
+        return works.stream().mapToLong(Work::getDailyWage).sum();
     }
 }

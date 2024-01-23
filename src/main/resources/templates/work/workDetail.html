@@ -205,22 +205,22 @@
               tbody.appendChild(tr);
             } else {
               // 근무 기록이 있는 경우
-              data.content.forEach((workLog, index) => {
+              data.content.forEach((work, index) => {
                 // 번호 계산
                 const number = page * parseInt(size) + (index + 1);
                 const tr = document.createElement("tr");
 
                 tr.innerHTML = `
                         <td>${number}</td>
-                        <td>${workLog.workDate}</td>
-                        <td>${workLog.startTime}</td>
-                        <td>${workLog.endTime}</td>                        
-                        <td>${workLog.totalHours}시간 ${workLog.totalMinutes}분</td>
-                        <td>${workLog.dailyWage}원</td>
+                        <td>${work.workDate}</td>
+                        <td>${work.startTime}</td>
+                        <td>${work.endTime}</td>
+                        <td>${work.totalHours}시간 ${work.totalMinutes}분</td>
+                        <td>${work.dailyWage}원</td>
                         
         <td>
-            <button data-id="${workLog.id}" class="btn btn-warning edit-btn">수정</button>
-            <button data-id="${workLog.id}" class="btn btn-danger delete-btn">삭제</button>
+            <button data-id="${work.id}" class="btn btn-warning edit-btn">수정</button>
+            <button data-id="${work.id}" class="btn btn-danger delete-btn">삭제</button>
         </td>
                     `;
 

@@ -1,6 +1,6 @@
 package com.salary.domain;
 
-import com.salary.dto.WorkLogRequest;
+import com.salary.dto.WorkRequest;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,12 +10,12 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Entity
-@Table(name = "work_log")
+@Table(name = "work")
 @Getter
 @Setter
-public class WorkLog {
+public class Work {
     @Id
-    @Column(name = "work_log_id")
+    @Column(name = "work_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -55,9 +55,9 @@ public class WorkLog {
         return Math.round(wage.getHourlyRate() * hoursWorked); // 반올림
     }
 
-    public void update(WorkLogRequest workLogRequest) {
-        this.workDate = workLogRequest.getWorkDate();
-        this.startTime = workLogRequest.getStartTime();
-        this.endTime = workLogRequest.getEndTime();
+    public void update(WorkRequest workRequest) {
+        this.workDate = workRequest.getWorkDate();
+        this.startTime = workRequest.getStartTime();
+        this.endTime = workRequest.getEndTime();
     }
 }

@@ -25,13 +25,11 @@ public class User implements UserDetails {
     @Column(name = "user_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    private String username;  // 사용자 이름 또는 아이디
-
-    private String password;  // 비밀번호
+    private String username;
+    private String password;
 
     @Column(unique = true)
-    private String email;     // 사용자 이메일
+    private String email;
 
     @Enumerated(EnumType.STRING)
     private Role role;
@@ -45,7 +43,7 @@ public class User implements UserDetails {
         return user;
     }
 
-    public String getActualUsername() { // 실제 사용자의 이름을 반환
+    public String getRealUsername() { // 실제 사용자의 이름을 반환
         return username;
     }
 

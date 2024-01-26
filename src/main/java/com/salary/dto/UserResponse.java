@@ -10,7 +10,7 @@ public class UserResponse {
     private String email;
 
     public UserResponse(User user) {
-        this.username = user.getActualUsername();
+        this.username = user.getRealUsername();
         this.email = user.getEmail();
     }
 }

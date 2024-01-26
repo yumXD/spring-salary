@@ -25,7 +25,7 @@ public class UserApiController {
     @PostMapping
     public ResponseEntity<User> register(@Valid @RequestBody UserRequest request) {
         User savedUser = userService.createUser(request);
-        log.info("{} 님 회원가입 완료", savedUser.getActualUsername());
+        log.info("{} 님 회원가입 완료", savedUser.getRealUsername());
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(savedUser.getId())
@@ -46,7 +46,7 @@ public class UserApiController {
     @GetMapping("/{id}")
     public ResponseEntity<UserResponse> findUser(@PathVariable("id") Long id) {
         User user = userService.findById(id);
-        log.info("{} 님 정보 조회완료", user.getActualUsername());
+        log.info("{} 님 정보 조회완료", user.getRealUsername());
         return ResponseEntity.ok()
                 .body(new UserResponse(user));
     }
@@ -54,7 +54,7 @@ public class UserApiController {
     @PutMapping("/{id}")
     public ResponseEntity<User> updateUser(@Valid @RequestBody UserRequest request, @PathVariable("id") Long id) {
         User updatedUser = userService.update(id, request);
-        log.info("{} 님 정보 수정완료 (비밀번호 만)", updatedUser.getActualUsername());
+        log.info("{} 님 정보 수정완료 (비밀번호 만)", updatedUser.getRealUsername());
         return ResponseEntity.ok()
                 .body(updatedUser);
     }

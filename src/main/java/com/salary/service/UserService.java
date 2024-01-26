@@ -22,9 +22,7 @@ public class UserService {
 
     public User createUser(UserRequest request) {
         validateDuplicateEmail(request.getEmail());
-
         User user = User.createUser(request, bCryptPasswordEncoder);
-
         return userRepository.save(user);
     }
 

@@ -5,117 +5,103 @@
 >
   <th:block layout:fragment="script">
     <script th:inline="javascript">
-      const employeeId = document.getElementById("employeeId").value;
+      $(document).ready(function () {
+        const employeeId = document.getElementById("employeeId").value;
+        const deleteButton = document.getElementById("delete-btn");
 
-      if (employeeId) {
-        // ID 값이 있을 때만 API 호출
-        fetch("/api/employees/" + employeeId)
-          .then((response) => {
-            if (!response.ok) {
-              throw new Error("알수 없는 오류가 발생했습니다.");
-            }
-            return response.json();
-          })
-          .then((data) => {
-            document.getElementById("name").value = data.name;
-            document.getElementById("position").value = data.position;
-            document.getElementById("department").value = data.department;
-            // 추가 필드들도 여기에 추가합니다.
-          })
-          .catch((error) => {
-            alert(error);
-            location.replace(`/employee/${employeeId}`);
-          });
-      }
-
-      const registerButton = document.getElementById("register-btn");
-
-      if (registerButton) {
-        registerButton.addEventListener("click", (event) => {
-          fetch(`/api/employees`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
+        if (employeeId) {
+          $.ajax({
+            url: "/api/employees/" + employeeId,
+            method: "GET",
+            dataType: "json",
+            success: function (data) {
+              $("#name").val(data.name);
+              $("#position").val(data.position);
+              $("#department").val(data.department);
             },
-            body: JSON.stringify({
-              name: document.getElementById("name").value,
-              position: document.getElementById("position").value,
-              department: document.getElementById("department").value,
-            }),
-          })
-            .then((response) => {
-              if (!response.ok) {
-                return response.json().then((error) => {
-                  throw new Error(error.message);
-                });
-              }
-              return response.json();
-            })
-            .then((data) => {
-              alert("직원등록 완료되었습니다.");
-              location.replace(`/employees`);
-            })
-            .catch((error) => {
-              alert(error);
-            });
-        });
-      }
-
-      const modifyButton = document.getElementById("modify-btn");
-
-      if (modifyButton) {
-        modifyButton.addEventListener("click", (event) => {
-          fetch(`/api/employees/${employeeId}`, {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              name: document.getElementById("name").value,
-              position: document.getElementById("position").value,
-              department: document.getElementById("department").value,
-            }),
-          })
-            .then((response) => {
-              if (!response.ok) {
-                return response.json().then((error) => {
-                  throw new Error(error.message);
-                });
-              }
-              return response.json();
-            })
-            .then((data) => {
-              alert("수정 완료되었습니다.");
+            error: function (jqXHR, textStatus, errorThrown) {
+              alert("잘못된 접근입니다.");
               location.replace(`/employee/${employeeId}`);
-            })
-            .catch((error) => {
-              alert(error);
-            });
-        });
-      }
+            },
+          });
+        }
 
-      const deleteButton = document.getElementById("delete-btn");
-
-      if (deleteButton) {
-        deleteButton.addEventListener("click", (event) => {
-          if (confirm("정말로 직원 삭제 하시겠습니까?")) {
-            fetch(`/api/employees/${employeeId}`, {
-              method: "DELETE",
-            })
-              .then((response) => {
-                if (response.ok) {
-                  alert("직원 삭제가 완료되었습니다.");
-                  location.replace(`/employees`);
-                } else {
-                  throw new Error("직원 삭제 중 오류가 발생했습니다.");
-                }
-              })
-              .catch((error) => {
-                alert(error);
+        $("#registrationForm").submit(function (event) {
+          if (this.checkValidity()) {
+            event.preventDefault();
+            if (!employeeId) {
+              $.ajax({
+                url: "/api/employees",
+                method: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({
+                  name: $("#name").val(),
+                  position: $("#position").val(),
+                  department: $("#department").val(),
+                }),
+                success: function (data) {
+                  alert("직원 등록이 완료되었습니다.");
+                  location.replace("/employees");
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                  if (jqXHR.status === 400 || jqXHR.status === 422) {
+                    // 서버에서 반환한 오류 메시지를 가져와서 사용자에게 표시
+                    var errorObj = JSON.parse(jqXHR.responseText);
+                    alert(errorObj.message);
+                  } else {
+                    alert("알 수 없는 오류가 발생했습니다.");
+                  }
+                },
               });
+            } else {
+              $.ajax({
+                url: "/api/employees/" + employeeId,
+                method: "PUT",
+                contentType: "application/json",
+                data: JSON.stringify({
+                  name: $("#name").val(),
+                  position: $("#position").val(),
+                  department: $("#department").val(),
+                }),
+                success: function (data) {
+                  alert("수정이 완료되었습니다.");
+                  location.replace("/employee/" + employeeId);
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                  if (!jqXHR.ok) {
+                    var errorObj = JSON.parse(jqXHR.responseText);
+                    alert(errorObj.message);
+                  } else {
+                    alert("알 수 없는 오류가 발생했습니다.");
+                  }
+                },
+              });
+            }
           }
         });
-      }
+
+        if (deleteButton) {
+          $(deleteButton).on("click", function (event) {
+            if (confirm("정말로 직원 삭제 하시겠습니까?")) {
+              $.ajax({
+                url: "/api/employees/" + employeeId,
+                method: "DELETE",
+                success: function (data) {
+                  alert("직원 삭제가 완료되었습니다.");
+                  location.replace("/employees");
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                  if (!jqXHR.ok) {
+                    throw new Error("직원 삭제 중 오류가 발생했습니다.");
+                  } else {
+                    alert("알 수 없는 오류가 발생했습니다.");
+                  }
+                },
+              });
+            }
+          });
+        }
+      });
     </script>
   </th:block>
 
@@ -129,38 +115,37 @@
           id="name"
           name="name"
           class="form-control"
+          placeholder="직원 이름을 입력하세요"
           required
         />
       </div>
       <div class="form-group">
         <label for="position">직책:</label>
         <input
-          type="position"
+          type="text"
           id="position"
           name="position"
           class="form-control"
+          placeholder="직책을 입력하세요"
           required
         />
       </div>
       <div class="form-group">
         <label for="department">부서:</label>
         <input
-          type="department"
+          type="text"
           id="department"
           name="department"
           class="form-control"
+          placeholder="부서를 입력하세요"
           required
         />
       </div>
       <div th:if="${#strings.isEmpty(id)}" style="text-align: center">
-        <button type="button" class="btn btn-success" id="register-btn">
-          등록하기
-        </button>
+        <button type="submit" class="btn btn-success">등록하기</button>
       </div>
       <div th:unless="${#strings.isEmpty(id)}" style="text-align: center">
-        <button type="button" id="modify-btn" class="btn btn-primary">
-          수정하기
-        </button>
+        <button type="submit" class="btn btn-primary">수정하기</button>
         <button type="button" id="delete-btn" class="btn btn-danger">
           직원 삭제
         </button>

@@ -3,6 +3,22 @@
   layout:decorate="~{layouts/layout1}"
   xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 >
+  <th:block layout:fragment="css">
+    <style>
+      .password-container {
+        position: relative;
+      }
+
+      .toggle-password {
+        position: absolute;
+        top: 72%;
+        transform: translateY(-50%);
+        right: 17px;
+        cursor: pointer;
+      }
+    </style>
+  </th:block>
+
   <th:block layout:fragment="script">
     <script th:inline="javascript">
       $(document).ready(function () {
@@ -120,6 +136,14 @@
             }
           });
         }
+
+        $(".toggle-password").click(function () {
+          const passwordInput = $("#password");
+          const type =
+            passwordInput.attr("type") === "password" ? "text" : "password";
+          passwordInput.attr("type", type);
+          $(this).toggleClass("fa-eye fa-eye-slash");
+        });
       });
     </script>
   </th:block>
@@ -151,7 +175,7 @@
           required
         />
       </div>
-      <div class="form-group">
+      <div class="form-group password-container">
         <label for="password">비밀번호:</label>
         <input
           type="password"
@@ -160,7 +184,7 @@
           class="form-control"
           placeholder="비밀번호를 입력하세요"
           required
-        />
+        /><i class="toggle-password fa fa-eye fa-lg"></i>
       </div>
       <div th:if="${#strings.isEmpty(id)}" style="text-align: center">
         <!-- 추가적으로 필요한 필드가 있다면 여기에 추가합니다. -->

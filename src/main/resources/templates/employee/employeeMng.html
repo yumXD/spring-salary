@@ -5,177 +5,176 @@
 >
   <th:block layout:fragment="script">
     <script th:inline="javascript">
-      const sizeSelector = document.getElementById("sizeSelector");
+      // 페이지를 로드할 때 URL의 쿼리 매개변수로부터 페이지 번호를 가져옵니다.
+      $(document).ready(function () {
+        var sizeSelector = $("#sizeSelector");
+        var searchNameInput = $("#searchName");
 
-      // size 값 변경 리스너 추가
-      sizeSelector.addEventListener("change", function () {
-        // 현재 페이지를 0으로 설정하고, 선택된 size로 목록 다시 로드
-        updateURLForPageAndSize(0); // size 변경 시 페이지는 0으로 리셋
-        loadEmployees(0);
-      });
-      // URL에서 페이지 번호를 가져오는 함수
-      function getPageFromURL() {
-        const urlParams = new URLSearchParams(window.location.search);
-        return parseInt(urlParams.get("page") || "0");
-      }
+        // URL에서 값 가져오기
+        var sizeFromURL = getSizeFromURL();
+        var nameFromURL = getNameFromURL();
+        var pageFromURL = getPageFromURL();
 
-      // URL에서 size 값을 가져오는 함수
-      function getSizeFromURL() {
-        const urlParams = new URLSearchParams(window.location.search);
-        return urlParams.get("size") || "3"; // 기본값을 3으로 설정
-      }
+        // 값 설정
+        sizeSelector.val(sizeFromURL);
+        searchNameInput.val(nameFromURL);
 
-      function getNameFromURL() {
-        const urlParams = new URLSearchParams(window.location.search);
-        return urlParams.get("name") || "";
-      }
+        loadEmployees(pageFromURL);
 
-      // 사용자가 페이지를 이동할 때 URL의 쿼리 매개변수를 업데이트합니다.
-      function updateURLForPageAndSize(page) {
-        const size = sizeSelector.value;
-        const name = document.getElementById("searchName").value; // 이름 값을 가져옵니다.
-        const url = new URL(window.location.href);
-        url.searchParams.set("name", name); // 쿼리 매개변수로 추가합니다.
-        url.searchParams.set("page", page);
-        url.searchParams.set("size", size);
-        window.history.pushState({}, "", url);
-      }
-
-      document
-        .getElementById("searchButton")
-        .addEventListener("click", function () {
-          updateURLForPageAndSize(0); // 검색시 항상 첫 페이지부터 시작
+        // size 값 변경 리스너 추가
+        sizeSelector.change(function () {
+          // 현재 페이지를 0으로 설정하고, 선택된 size로 목록 다시 로드
+          updateURLForPageAndSize(0); // size 변경 시 페이지는 0으로 리셋
           loadEmployees(0);
         });
 
-      function loadEmployees(page) {
-        const size = sizeSelector.value; // 선택된 size 값 가져오기
-        const name = getNameFromURL(); // URL에서 이름 값을 가져옵니다.
-        fetch(`/api/employees?name=${name}&page=${page}&size=${size}`)
-          .then((response) => {
-            if (!response.ok) {
-              throw new Error("직원 정보를 불러오는 데 실패하였습니다.");
-            }
-            return response.json();
-          })
-          .then((data) => {
-            const tbody = document.querySelector("#employeeTable tbody");
-            tbody.innerHTML = ""; // Clear current content
+        // URL에서 페이지 번호를 가져오는 함수
+        function getPageFromURL() {
+          const urlParams = new URLSearchParams(window.location.search);
+          return parseInt(urlParams.get("page") || "0");
+        }
 
-            if (data.content.length === 0) {
-              // 직원 데이터가 없을 경우
-              tbody.innerHTML = `
-        <tr>
-            <td colspan="4" style="text-align: center; vertical-align: middle; height: 50px;">직원이 존재하지 않습니다.</td>
-        </tr>`;
-            } else {
-              data.content.forEach((employee, index) => {
-                // 번호 계산
-                const number = page * parseInt(size) + (index + 1);
-                tbody.innerHTML += `
-                            <tr>
-                                <td>${number}</td>
-                                <td><a href="/employee/${employee.id}">${employee.name}</a></td>
-                                <td>${employee.position}</td>
-                                <td>${employee.department}</td>
-                            </tr>`;
-              });
-            }
+        // URL에서 size 값을 가져오는 함수
+        function getSizeFromURL() {
+          const urlParams = new URLSearchParams(window.location.search);
+          return urlParams.get("size") || "3"; // 기본값을 3으로 설정
+        }
 
-            const totalPages = data.totalPages;
-            updatePagination(page, totalPages);
-          })
-          .catch((error) => {
-            alert(error);
+        function getNameFromURL() {
+          const urlParams = new URLSearchParams(window.location.search);
+          return urlParams.get("name") || "";
+        }
+
+        // 사용자가 페이지를 이동할 때 URL의 쿼리 매개변수를 업데이트합니다.
+        function updateURLForPageAndSize(page) {
+          var size = $("#sizeSelector").val();
+          var name = $("#searchName").val();
+          var url = new URL(window.location.href);
+
+          // 쿼리 매개변수로 추가
+          url.searchParams.set("name", name);
+          url.searchParams.set("page", page);
+          url.searchParams.set("size", size);
+
+          // 브라우저 히스토리 업데이트
+          window.history.pushState({}, "", url);
+        }
+
+        $("#searchButton").click(function () {
+          // 검색시 항상 첫 페이지부터 시작
+          updateURLForPageAndSize(0);
+          loadEmployees(0);
+        });
+
+        function loadEmployees(page) {
+          var size = $("#sizeSelector").val();
+          var name = getNameFromURL();
+
+          $.ajax({
+            url: `/api/employees?name=${name}&page=${page}&size=${size}`,
+            method: "GET",
+            dataType: "json",
+            success: function (data) {
+              var tbody = $("#employeeTable tbody");
+              tbody.empty(); // Clear current content
+
+              if (data.content.length === 0) {
+                // 직원 데이터가 없을 경우
+                tbody.html(`
+            <tr>
+              <td colspan="4" style="text-align: center; vertical-align: middle; height: 50px;">직원이 존재하지 않습니다.</td>
+            </tr>`);
+              } else {
+                $.each(data.content, function (index, employee) {
+                  // 번호 계산
+                  var number = page * parseInt(size) + (index + 1);
+                  tbody.append(`
+              <tr>
+                <td>${number}</td>
+                <td><a href="/employee/${employee.id}">${employee.name}</a></td>
+                <td>${employee.position}</td>
+                <td>${employee.department}</td>
+              </tr>`);
+                });
+              }
+
+              var totalPages = data.totalPages;
+              updatePagination(page, totalPages);
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+              alert("직원 정보를 불러오는 데 실패하였습니다.");
+            },
+            complete: function () {
+              // 페이지 로드 후 URL의 쿼리 매개변수를 업데이트합니다.
+              updateURLForPageAndSize(page);
+            },
           });
-
-        // 페이지 로드 후 URL의 쿼리 매개변수를 업데이트합니다.
-        updateURLForPageAndSize(page);
-      }
-
-      function updatePagination(current, total) {
-        const pagination = document.querySelector("#pagination");
-
-        if (total === 0) {
-          // 직원 데이터가 없는 경우 페이지네이션을 숨김
-          pagination.style.display = "none";
-          return;
-        } else {
-          pagination.style.display = "";
         }
 
-        const isFirstPage = current === 0;
-        const isLastPage = current === total - 1;
+        function updatePagination(current, total) {
+          var pagination = $("#pagination");
 
-        pagination.innerHTML = `
-        <li class="page-item ${isFirstPage ? "disabled" : ""}" id="firstPage">
-            <a class="page-link" href="javascript:void(0)">첫 페이지</a>
-        </li>
-        <li class="page-item ${
-          isFirstPage ? "disabled" : ""
-        }" id="previousPage">
-            <a class="page-link" href="javascript:void(0)">이전</a>
-        </li>
-    `;
+          if (total === 0) {
+            // 직원 데이터가 없는 경우 페이지네이션을 숨김
+            pagination.hide();
+            return;
+          } else {
+            pagination.show();
+          }
 
-        for (let i = 0; i < total; i++) {
-          pagination.innerHTML += `
-            <li class="page-item ${i === current ? "active" : ""}">
-                <a class="page-link" href="javascript:void(0)" data-page="${i}">${
-            i + 1
-          }</a>
-            </li>`;
-        }
+          var isFirstPage = current === 0;
+          var isLastPage = current === total - 1;
 
-        pagination.innerHTML += `
-        <li class="page-item ${isLastPage ? "disabled" : ""}" id="nextPage">
-            <a class="page-link" href="javascript:void(0)">다음</a>
-        </li>
-        <li class="page-item ${isLastPage ? "disabled" : ""}" id="lastPage">
-            <a class="page-link" href="javascript:void(0)">마지막 페이지</a>
-        </li>
-    `;
+          pagination.html(`
+      <li class="page-item ${isFirstPage ? "disabled" : ""}" id="firstPage">
+        <a class="page-link" href="javascript:void(0)">첫 페이지</a>
+      </li>
+      <li class="page-item ${isFirstPage ? "disabled" : ""}" id="previousPage">
+        <a class="page-link" href="javascript:void(0)">이전</a>
+      </li>`);
 
-        if (!isFirstPage) {
-          document
-            .querySelector("#firstPage")
-            .addEventListener("click", (e) => {
+          for (var i = 0; i < total; i++) {
+            pagination.append(`
+        <li class="page-item ${i === current ? "active" : ""}">
+          <a class="page-link" href="javascript:void(0)" data-page="${i}">${
+              i + 1
+            }</a>
+        </li>`);
+          }
+
+          pagination.append(`
+      <li class="page-item ${isLastPage ? "disabled" : ""}" id="nextPage">
+        <a class="page-link" href="javascript:void(0)">다음</a>
+      </li>
+      <li class="page-item ${isLastPage ? "disabled" : ""}" id="lastPage">
+        <a class="page-link" href="javascript:void(0)">마지막 페이지</a>
+      </li>`);
+
+          if (!isFirstPage) {
+            $("#firstPage").click(function () {
               loadEmployees(0);
             });
 
-          document
-            .querySelector("#previousPage")
-            .addEventListener("click", (e) => {
+            $("#previousPage").click(function () {
               if (current > 0) loadEmployees(current - 1);
             });
-        }
+          }
 
-        if (!isLastPage) {
-          document.querySelector("#nextPage").addEventListener("click", (e) => {
-            if (current < total - 1) loadEmployees(current + 1);
-          });
+          if (!isLastPage) {
+            $("#nextPage").click(function () {
+              if (current < total - 1) loadEmployees(current + 1);
+            });
 
-          document.querySelector("#lastPage").addEventListener("click", (e) => {
-            loadEmployees(total - 1);
-          });
-        }
+            $("#lastPage").click(function () {
+              loadEmployees(total - 1);
+            });
+          }
 
-        document.querySelectorAll(".page-link[data-page]").forEach((link) => {
-          link.addEventListener("click", function (event) {
-            let page = parseInt(event.currentTarget.dataset.page);
+          $(".page-link[data-page]").click(function (event) {
+            var page = parseInt($(event.currentTarget).data("page"));
             loadEmployees(page);
           });
-        });
-      }
-
-      // 페이지를 로드할 때 URL의 쿼리 매개변수로부터 페이지 번호를 가져옵니다.
-      document.addEventListener("DOMContentLoaded", function () {
-        const sizeFromURL = getSizeFromURL();
-        sizeSelector.value = sizeFromURL;
-        const nameFromURL = getNameFromURL(); // URL에서 이름 값을 가져옵니다.
-        document.getElementById("searchName").value = nameFromURL; // 입력 필드에 이름 값을 설정합니다.
-        const pageFromURL = getPageFromURL();
-        loadEmployees(pageFromURL);
+        }
       });
     </script>
   </th:block>

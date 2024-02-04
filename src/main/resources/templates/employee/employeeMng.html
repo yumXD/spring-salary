@@ -60,7 +60,9 @@
           window.history.pushState({}, "", url);
         }
 
-        $("#searchButton").click(function () {
+        $("#searchForm").submit(function (event) {
+          // 기본 제출 동작을 막음
+          event.preventDefault();
           // 검색시 항상 첫 페이지부터 시작
           updateURLForPageAndSize(0);
           loadEmployees(0);
@@ -194,23 +196,26 @@
         </select>
       </div>
       <div class="col-8">
-        <div class="input-group">
-          <input
-            type="text"
-            class="form-control"
-            id="searchName"
-            placeholder="이름 검색"
-          />
-          <div class="input-group-append">
-            <button
-              class="btn btn-outline-secondary"
-              type="button"
-              id="searchButton"
-            >
-              찾기
-            </button>
+        <form id="searchForm">
+          <div class="input-group">
+            <input
+              type="text"
+              class="form-control"
+              id="searchName"
+              placeholder="검색할 이름을 입력하세요"
+              required
+            />
+            <div class="input-group-append">
+              <button
+                type="submit"
+                class="btn btn-outline-secondary"
+                id="searchButton"
+              >
+                찾기
+              </button>
+            </div>
           </div>
-        </div>
+        </form>
       </div>
     </div>
 

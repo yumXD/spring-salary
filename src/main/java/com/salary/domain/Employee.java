@@ -22,6 +22,9 @@ public class Employee {
     private String position;
     private String department;
 
+    private String dob;
+    private String phone;
+
     @JsonIgnore
     @OneToOne(mappedBy = "employee", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private Wage wage;
@@ -30,5 +33,7 @@ public class Employee {
         this.name = request.getName();
         this.position = request.getPosition();
         this.department = request.getDepartment();
+        this.dob = request.getDob();
+        this.phone = request.getPhone();
     }
 }

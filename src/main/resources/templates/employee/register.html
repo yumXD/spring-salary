@@ -18,6 +18,12 @@
               $("#name").val(data.name);
               $("#position").val(data.position);
               $("#department").val(data.department);
+              $("#dob").val(
+                data.dob.replace(/(\d{4})(\d{2})(\d{2})/, "$1-$2-$3")
+              );
+              $("#phone").val(
+                data.phone.replace(/(\d{3})(\d{3,4})(\d{4})/, "$1-$2-$3")
+              );
             },
             error: function (jqXHR, textStatus, errorThrown) {
               alert("잘못된 접근입니다.");
@@ -29,6 +35,7 @@
         $("#registrationForm").submit(function (event) {
           if (this.checkValidity()) {
             event.preventDefault();
+
             if (!employeeId) {
               $.ajax({
                 url: "/api/employees",
@@ -38,6 +45,8 @@
                   name: $("#name").val(),
                   position: $("#position").val(),
                   department: $("#department").val(),
+                  phone: $("#phone").val().replace(/\D/g, ""),
+                  dob: $("#dob").val().replace(/\D/g, ""),
                 }),
                 success: function (data) {
                   alert("직원 등록이 완료되었습니다.");
@@ -62,6 +71,8 @@
                   name: $("#name").val(),
                   position: $("#position").val(),
                   department: $("#department").val(),
+                  phone: $("#phone").val().replace(/\D/g, ""),
+                  dob: $("#dob").val().replace(/\D/g, ""),
                 }),
                 success: function (data) {
                   alert("수정이 완료되었습니다.");
@@ -101,6 +112,40 @@
             }
           });
         }
+
+        $("#dob").on("input", function () {
+          // 현재 입력된 값 가져오기
+          var inputValue = $(this).val();
+
+          // 숫자만 남기기
+          var numericValue = inputValue.replace(/\D/g, "");
+
+          // 생년월일 형식으로 포맷팅
+          var dobFormatted = numericValue
+            .substring(0, 8)
+            .replace(/(\d{4})(\d{2})(\d{2})/, "$1-$2-$3");
+
+          $(this).val(dobFormatted);
+        });
+
+        // 전화번호 입력란에 입력이 발생할 때마다 실행
+        $("#phone").on("input", function () {
+          // 현재 입력된 전화번호 가져오기
+          var inputNumber = $(this).val();
+
+          // 숫자만 남기기
+          var numericNumber = inputNumber.replace(/\D/g, "");
+
+          // 전화번호 형식으로 포맷팅
+          var formattedNumber = numericNumber
+            .substring(0, 11)
+            .replace(/(\d{3})(\d{3,4})(\d{4})/, function (_, p1, p2, p3) {
+              return [p1, p2, p3].filter(Boolean).join("-");
+            });
+
+          // 포맷팅된 전화번호로 입력란 업데이트
+          $(this).val(formattedNumber);
+        });
       });
     </script>
   </th:block>
@@ -138,6 +183,28 @@
           name="department"
           class="form-control"
           placeholder="부서를 입력하세요"
+          required
+        />
+      </div>
+      <div class="form-group">
+        <label for="dob">생년월일:</label>
+        <input
+          type="text"
+          class="form-control"
+          id="dob"
+          name="dob"
+          placeholder="8자리를 입력하세요"
+          required
+        />
+      </div>
+      <div class="form-group">
+        <label for="phone">전화번호:</label>
+        <input
+          type="tel"
+          class="form-control"
+          id="phone"
+          name="phone"
+          placeholder="최대 11자리를 입력하세요"
           required
         />
       </div>

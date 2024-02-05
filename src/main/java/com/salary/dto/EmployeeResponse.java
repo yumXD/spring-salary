@@ -12,10 +12,15 @@ public class EmployeeResponse {
 
     private String department;
 
+    private String dob;
+    private String phone;
+
     public EmployeeResponse(Employee employee) {
         this.id = employee.getId();
         this.name = employee.getName();
         this.position = employee.getPosition();
         this.department = employee.getDepartment();
+        this.dob = employee.getDob();
+        this.phone = employee.getPhone();
     }
 }

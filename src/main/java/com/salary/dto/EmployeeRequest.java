@@ -15,12 +15,6 @@ public class EmployeeRequest {
     @NotBlank(message = "이름은 필수 항목입니다.")
     private String name;
 
-    @NotBlank(message = "직책은 필수 항목입니다.")
-    private String position;
-
-    @NotBlank(message = "부서는 필수 항목입니다.")
-    private String department;
-
     @NotBlank(message = "생년월일을 입력하세요")
     @Pattern(regexp = "\\d{8}", message = "생년월일은 8자리 숫자여야 합니다")
     private String dob;
@@ -31,8 +25,6 @@ public class EmployeeRequest {
     public Employee toEntity() {
         Employee employee = new Employee();
         employee.setName(name);
-        employee.setPosition(position);
-        employee.setDepartment(department);
         employee.setDob(dob);
         employee.setPhone(phone);
         return employee;

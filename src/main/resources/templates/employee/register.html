@@ -16,8 +16,6 @@
             dataType: "json",
             success: function (data) {
               $("#name").val(data.name);
-              $("#position").val(data.position);
-              $("#department").val(data.department);
               $("#dob").val(
                 data.dob.replace(/(\d{4})(\d{2})(\d{2})/, "$1-$2-$3")
               );
@@ -43,8 +41,6 @@
                 contentType: "application/json",
                 data: JSON.stringify({
                   name: $("#name").val(),
-                  position: $("#position").val(),
-                  department: $("#department").val(),
                   phone: $("#phone").val().replace(/\D/g, ""),
                   dob: $("#dob").val().replace(/\D/g, ""),
                 }),
@@ -69,8 +65,6 @@
                 contentType: "application/json",
                 data: JSON.stringify({
                   name: $("#name").val(),
-                  position: $("#position").val(),
-                  department: $("#department").val(),
                   phone: $("#phone").val().replace(/\D/g, ""),
                   dob: $("#dob").val().replace(/\D/g, ""),
                 }),
@@ -113,12 +107,45 @@
           });
         }
 
+        function validateDob(dob) {
+          var dobDate = new Date(
+            dob.substring(0, 4),
+            parseInt(dob.substring(4, 6)) - 1,
+            dob.substring(6, 8)
+          );
+          var minDobDate = new Date(1900, 0, 1); // 최소 허용 생년월일
+
+          // 입력된 생년월일이 최소 허용 생년월일보다 작으면 기본값으로 설정
+          if (dobDate < minDobDate) {
+            return "19000101";
+          }
+
+          var currentDate = new Date();
+
+          // 입력된 생년월일이 현재 날짜 이후면 오늘 날짜로 설정
+          if (dobDate > currentDate) {
+            var year = currentDate.getFullYear();
+            var month = ("0" + (currentDate.getMonth() + 1)).slice(-2);
+            var day = ("0" + currentDate.getDate()).slice(-2);
+            return `${year}${month}${day}`;
+          }
+
+          // 유효한 생년월일이면 그대로 반환
+          return dob;
+        }
+
         $("#dob").on("input", function () {
           // 현재 입력된 값 가져오기
           var inputValue = $(this).val();
 
           // 숫자만 남기기
           var numericValue = inputValue.replace(/\D/g, "");
+
+          // 8자리를 입력했는지 검증
+          if (numericValue.length === 8) {
+            // 유효성 검사
+            numericValue = validateDob(numericValue);
+          }
 
           // 생년월일 형식으로 포맷팅
           var dobFormatted = numericValue
@@ -161,28 +188,6 @@
           name="name"
           class="form-control"
           placeholder="직원 이름을 입력하세요"
-          required
-        />
-      </div>
-      <div class="form-group">
-        <label for="position">직책:</label>
-        <input
-          type="text"
-          id="position"
-          name="position"
-          class="form-control"
-          placeholder="직책을 입력하세요"
-          required
-        />
-      </div>
-      <div class="form-group">
-        <label for="department">부서:</label>
-        <input
-          type="text"
-          id="department"
-          name="department"
-          class="form-control"
-          placeholder="부서를 입력하세요"
           required
         />
       </div>

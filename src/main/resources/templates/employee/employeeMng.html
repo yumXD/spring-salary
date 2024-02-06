@@ -94,8 +94,8 @@
               <tr>
                 <td>${number}</td>
                 <td><a href="/employee/${employee.id}">${employee.name}</a></td>
-                <td>${employee.position}</td>
-                <td>${employee.department}</td>
+                <td>${formatDate(employee.dob)}</td>
+                <td>${formatPhone(employee.phone)}</td>
               </tr>`);
                 });
               }
@@ -177,6 +177,23 @@
             loadEmployees(page);
           });
         }
+
+        // 날짜 포맷팅 함수
+        function formatDate(dob) {
+          return dob.replace(/(\d{4})(\d{2})(\d{2})/, "$1-$2-$3");
+        }
+
+        // 전화번호 포맷팅 함수
+        function formatPhone(phone) {
+          return phone.replace(
+            /(\d{3})(\d{3,4})(\d{4})/,
+            function (_, p1, p2, p3) {
+              // 중간 부분을 *로 가려서 표시
+              var hiddenPart = "*".repeat(p2.length);
+              return `${p1}-${hiddenPart}-${p3}`;
+            }
+          );
+        }
       });
     </script>
   </th:block>
@@ -224,8 +241,8 @@
         <tr>
           <th>번호</th>
           <th>이름</th>
-          <th>직책</th>
-          <th>부서</th>
+          <th>생년월일</th>
+          <th>전화번호</th>
         </tr>
       </thead>
       <tbody>

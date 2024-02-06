@@ -19,9 +19,6 @@ public class Employee {
     private Long id;
 
     private String name;
-    private String position;
-    private String department;
-
     private String dob;
     private String phone;
 
@@ -31,8 +28,6 @@ public class Employee {
 
     public void update(EmployeeRequest request) {
         this.name = request.getName();
-        this.position = request.getPosition();
-        this.department = request.getDepartment();
         this.dob = request.getDob();
         this.phone = request.getPhone();
     }

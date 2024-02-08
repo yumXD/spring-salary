@@ -26,6 +26,10 @@ public class Employee {
     @OneToOne(mappedBy = "employee", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private Wage wage;
 
+    @JsonIgnore
+    @OneToOne(mappedBy = "employee", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private FileEntity fileEntity;
+
     public void update(EmployeeRequest request) {
         this.name = request.getName();
         this.dob = request.getDob();

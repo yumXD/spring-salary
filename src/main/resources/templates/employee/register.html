@@ -3,6 +3,32 @@
   layout:decorate="~{layouts/layout1}"
   xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 >
+  <th:block layout:fragment="css">
+    <style>
+      .preview-container {
+        width: 150px; /* 증명사진 너비 지정 */
+        height: 200px; /* 증명사진 높이 지정 */
+        border: 1px solid #dee2e6; /* 테두리 추가 */
+        border-radius: 5px; /* 둥근 테두리를 만듭니다. */
+        overflow: hidden; /* 넘치는 내용 숨김 */
+      }
+
+      .no-image {
+        width: 100%; /* 100% 너비로 설정 */
+        height: 100%; /* 100% 높이로 설정 */
+        background-color: #f8f9fa; /* 배경색을 정의 */
+        display: flex; /* 내부 요소를 수평으로 정렬 */
+        justify-content: center; /* 가운데 정렬 */
+        align-items: center; /* 가운데 정렬 */
+      }
+
+      .preview-image {
+        width: 100%; /* 100% 너비로 설정 */
+        height: 100%; /* 100% 높이로 설정 */
+      }
+    </style>
+  </th:block>
+
   <th:block layout:fragment="script">
     <script th:inline="javascript">
       $(document).ready(function () {
@@ -22,6 +48,16 @@
               $("#phone").val(
                 data.phone.replace(/(\d{3})(\d{3,4})(\d{4})/, "$1-$2-$3")
               );
+              // 이미지 표시
+              var imageUrl = data.imageUrl; // 이미지 URL을 데이터에서 가져옴
+              if (imageUrl) {
+                var imgElement = $("<img>")
+                  .attr("src", "/images/" + imageUrl)
+                  .addClass("preview-image");
+                $("#photoPreview").html(imgElement); // 미리보기 영역에 이미지 추가
+                $("#photo").prop("disabled", true); // 입력 요소를 비활성화하여 유효성 검사에서 제외
+                $("#photo").hide();
+              }
             },
             error: function (jqXHR, textStatus, errorThrown) {
               alert("잘못된 접근입니다.");
@@ -34,16 +70,32 @@
           if (this.checkValidity()) {
             event.preventDefault();
 
+            var formData = new FormData();
+
+            // JSON 데이터를 FormData에 추가
+            formData.append(
+              "employeeRequest",
+              new Blob(
+                [
+                  JSON.stringify({
+                    name: $("#name").val(),
+                    phone: $("#phone").val().replace(/\D/g, ""),
+                    dob: $("#dob").val().replace(/\D/g, ""),
+                  }),
+                ],
+                { type: "application/json" }
+              )
+            );
+
+            formData.append("file", $("#photo")[0].files[0]);
+
             if (!employeeId) {
               $.ajax({
                 url: "/api/employees",
                 method: "POST",
-                contentType: "application/json",
-                data: JSON.stringify({
-                  name: $("#name").val(),
-                  phone: $("#phone").val().replace(/\D/g, ""),
-                  dob: $("#dob").val().replace(/\D/g, ""),
-                }),
+                processData: false,
+                contentType: false,
+                data: formData,
                 success: function (data) {
                   alert("직원 등록이 완료되었습니다.");
                   location.replace("/employees");
@@ -173,12 +225,33 @@
           // 포맷팅된 전화번호로 입력란 업데이트
           $(this).val(formattedNumber);
         });
+
+        $("#photo").on("change", function (e) {
+          var input = e.target;
+          if (input.files && input.files[0]) {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+              $("#photoPreview").removeClass("no-image"); // 이미지가 있을 때 클래스 제거
+              $("#photoPreview").html(
+                '<img class="preview-image" src="' +
+                  e.target.result +
+                  '" alt="Preview">'
+              );
+            };
+
+            reader.readAsDataURL(input.files[0]);
+          } else {
+            $("#photoPreview").addClass("no-image"); // 이미지가 없을 때 클래스 추가
+            $("#photoPreview").html("No image");
+          }
+        });
       });
     </script>
   </th:block>
 
   <div layout:fragment="content">
-    <form id="registrationForm">
+    <form id="registrationForm" enctype="multipart/form-data">
       <div class="form-group">
         <input type="hidden" id="employeeId" th:value="${id}" />
         <label for="name">직원 이름:</label>
@@ -188,6 +261,21 @@
           name="name"
           class="form-control"
           placeholder="직원 이름을 입력하세요"
+          required
+        />
+      </div>
+      <div class="form-group">
+        <label for="photo">증명사진 업로드</label>
+        <div class="preview-container">
+          <div id="photoPreview" class="no-image">No image</div>
+        </div>
+        <br />
+        <input
+          type="file"
+          class="form-control-file"
+          id="photo"
+          name="photo"
+          accept="image/*"
           required
         />
       </div>

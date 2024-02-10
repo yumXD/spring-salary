@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
@@ -23,8 +24,9 @@ public class EmployeeApiController {
     private final EmployeeService employeeService;
 
     @PostMapping
-    public ResponseEntity<Employee> createEmployee(@Valid @RequestBody EmployeeRequest employeeRequest) {
-        Employee savedEmployee = employeeService.createEmployee(employeeRequest);
+    public ResponseEntity<Employee> createEmployee(@Valid @RequestPart("employeeRequest") EmployeeRequest employeeRequest,
+                                                   @RequestPart(value = "file") MultipartFile file) {
+        Employee savedEmployee = employeeService.createEmployee(employeeRequest, file);
         log.info("{} 직원 추가 완료", savedEmployee.getName());
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")

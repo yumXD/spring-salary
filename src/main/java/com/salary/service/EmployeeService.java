@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -17,9 +18,13 @@ import java.util.List;
 @Service
 public class EmployeeService {
     private final EmployeeRepository employeeRepository;
+    private final FileService fileService;
 
-    public Employee createEmployee(EmployeeRequest employeeRequest) {
-        return employeeRepository.save(employeeRequest.toEntity());
+    @Transactional
+    public Employee createEmployee(EmployeeRequest employeeRequest, MultipartFile file) {
+        Employee employee = employeeRepository.save(employeeRequest.toEntity());
+        fileService.saveFile(employee, file);
+        return employee;
     }
 
     public List<Employee> findAll() {

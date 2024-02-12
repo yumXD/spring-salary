@@ -12,6 +12,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -42,5 +45,18 @@ public class FileService {
         }
 
         return fileRepository.save(fileEntity);
+    }
+
+    public void deleteFile(Long id) {
+        FileEntity file = fileRepository.findByEmployeeId(id);
+        // 파일 경로 생성
+        Path filePath = Paths.get(fileDir).resolve(file.getSavedNm());
+
+        // 파일 삭제
+        try {
+            Files.deleteIfExists(filePath);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
